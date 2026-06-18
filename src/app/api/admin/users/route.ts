@@ -6,7 +6,7 @@ import User from '@/models/User';
 export async function GET() {
   try {
     const session = await auth();
-    if (!session || !session.user || session.user.role !== 'admin') {
+    if (!session || !session.user || (session.user as any).role !== 'admin') {
       return NextResponse.json({ error: 'غير مصرح - للمدراء فقط' }, { status: 403 });
     }
 
