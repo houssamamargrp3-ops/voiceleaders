@@ -335,7 +335,7 @@ body {
 @media (max-width: 768px) {
   .main-content {
     margin-right: 0;
-    padding: 88px 16px 72px 16px;
+    padding: 80px 14px 80px 14px;
   }
   .sidebar { display: none; }
 }
@@ -346,11 +346,12 @@ body {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 1000;
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(212, 175, 55, 0.12);
-  padding: 8px 0;
-  height: 72px;
+  background: rgba(10, 10, 10, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  padding: 6px 0 env(safe-area-inset-bottom, 6px);
+  height: 64px;
 }
 @media (max-width: 768px) { .mobile-tabbar { display: flex; } }
 .tab-item {
@@ -495,7 +496,46 @@ body {
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 @media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px) { .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 12px; } }
+
+/* ===== MOBILE GLOBAL FIXES ===== */
+@media (max-width: 768px) {
+  /* Typography scale down */
+  .section-title { font-size: 1.4rem; }
+  h1 { font-size: 1.6rem !important; }
+  h2 { font-size: 1.2rem !important; }
+
+  /* Cards padding */
+  .card { border-radius: 12px; }
+  .stat-card { padding: 14px; }
+  .challenge-card { padding: 16px; }
+  .admin-stat { padding: 14px; }
+
+  /* Buttons full width on mobile when inside form */
+  .btn-gold, .btn-outline { padding: 11px 20px; font-size: 0.85rem; }
+
+  /* Navbar logo text hide on very small screens */
+  .navbar-title-sub { display: none; }
+
+  /* Modal full screen on mobile */
+  .modal { border-radius: 16px 16px 0 0; max-height: 85vh; padding: 20px 16px; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+
+  /* Tables scroll horizontal */
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+
+  /* Filters scroll row on mobile */
+  .filter-bar { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  /* Tabs scroll on mobile */
+  .tabs { overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  /* Profile page */
+  .profile-cover { height: 160px; }
+  .profile-avatar-wrap { margin-left: 16px; }
+}
 
 /* ===== TOOLTIP ===== */
 .tooltip-wrap { position: relative; }

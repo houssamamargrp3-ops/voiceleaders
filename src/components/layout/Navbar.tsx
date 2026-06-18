@@ -2,78 +2,55 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-
 import { useSession } from 'next-auth/react';
-
-const navLinks = [
-  { href: '/dashboard', label: 'الرئيسية', icon: '🏠' },
-  { href: '/feed', label: 'الفيديوهات', icon: '🎥' },
-  { href: '/courses', label: 'الدورات', icon: '📚' },
-  { href: '/challenges', label: 'التحديات', icon: '🏆' },
-  { href: '/events', label: 'الفعاليات', icon: '📅' },
-];
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const { data: session } = useSession();
   const user = session?.user as any;
   const role = user?.role || 'trainee';
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" style={{ padding: '0 16px' }}>
       {/* Logo */}
-      <Link href="/dashboard" className="flex items-center gap-2" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div className="logo-icon" style={{ fontSize: '1.8rem' }}>🎤</div>
+      <Link href="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <div style={{ fontSize: '1.6rem' }}>🎤</div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fff', lineHeight: 1.1 }}>المنيعة لقادة الإلقاء</div>
-          <div style={{ fontSize: '0.55rem', color: '#D4AF37', fontWeight: 600, letterSpacing: '1px' }}>DZ YOUNG LEADERS</div>
+          <div style={{ fontWeight: 800, fontSize: '0.85rem', color: '#fff', lineHeight: 1.1 }}>المنيعة لقادة الإلقاء</div>
+          <div className="navbar-title-sub" style={{ fontSize: '0.5rem', color: '#D4AF37', fontWeight: 600, letterSpacing: '1px' }}>DZ YOUNG LEADERS</div>
         </div>
       </Link>
 
-      {/* Desktop Nav Links */}
-      <div style={{ display: 'flex', gap: 4, marginRight: 32, flex: 1 }} className="hidden-mobile">
-        {navLinks.filter(link => role !== 'trainer' || link.href === '/dashboard').map(link => (
+      {/* Desktop Nav Links - hidden on mobile */}
+      <div style={{ display: 'flex', gap: 4, marginRight: 24, flex: 1 }} className="hidden-mobile">
+        {[
+          { href: '/dashboard', label: 'الرئيسية' },
+          { href: '/courses', label: 'الدورات' },
+          { href: '/challenges', label: 'التحديات' },
+          { href: '/events', label: 'الفعاليات' },
+        ].map(link => (
           <Link
             key={link.href}
             href={link.href}
             style={{
-              padding: '7px 14px',
-              borderRadius: 8,
-              fontSize: '0.85rem',
-              fontWeight: 500,
+              padding: '7px 14px', borderRadius: 8,
+              fontSize: '0.85rem', fontWeight: 500,
               textDecoration: 'none',
               color: pathname === link.href ? '#D4AF37' : '#BBBBBB',
               background: pathname === link.href ? 'rgba(212,175,55,0.1)' : 'transparent',
               transition: 'all 0.2s ease',
             }}
-          >
-            {link.label}
-          </Link>
+          >{link.label}</Link>
         ))}
       </div>
 
-      {/* Right Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginRight: 'auto' }}>
-        {/* Search */}
-        <button
-          id="search-btn"
-          style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.07)',
-            color: '#888', cursor: 'pointer', fontSize: '1rem',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          🔍
-        </button>
+      {/* Right side actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 'auto' }}>
 
-        {/* Notifications */}
-        <div className="dropdown" style={{ position: 'relative' }}>
+        {/* Notifications - hidden on mobile (accessible via profile tab) */}
+        <div className="dropdown hidden-mobile" style={{ position: 'relative' }}>
           <button
-            id="notif-btn"
             onClick={() => setNotifOpen(!notifOpen)}
             style={{
               width: 36, height: 36, borderRadius: 8,
@@ -109,23 +86,20 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Upload Button */}
+        {/* Upload Button - icon only on mobile */}
         {role !== 'trainer' && (
           <Link
             href="/upload"
-            id="upload-btn"
             style={{
-              padding: '7px 16px',
-              borderRadius: 8,
+              padding: '7px 14px', borderRadius: 8,
               background: 'linear-gradient(135deg, #A8860F, #D4AF37)',
-              color: '#0A0A0A',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease',
+              color: '#0A0A0A', fontWeight: 700,
+              fontSize: '0.82rem', textDecoration: 'none',
+              transition: 'all 0.2s ease', flexShrink: 0,
             }}
           >
-            + رفع
+            <span className="hidden-mobile">+ رفع فيديو</span>
+            <span className="show-mobile">+</span>
           </Link>
         )}
 
@@ -137,15 +111,22 @@ export default function Navbar() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 700, fontSize: '0.85rem', color: '#0A0A0A',
             border: '2px solid rgba(212,175,55,0.4)',
-            cursor: 'pointer',
+            cursor: 'pointer', flexShrink: 0,
           }}>
-            أ
+            {user?.name?.[0] || 'م'}
           </div>
         </Link>
       </div>
 
       <style>{`
-        @media (max-width: 768px) { .hidden-mobile { display: none !important; } }
+        @media (max-width: 768px) {
+          .hidden-mobile { display: none !important; }
+          .show-mobile { display: inline !important; }
+          .navbar { height: 58px !important; }
+        }
+        @media (min-width: 769px) {
+          .show-mobile { display: none !important; }
+        }
       `}</style>
     </nav>
   );
