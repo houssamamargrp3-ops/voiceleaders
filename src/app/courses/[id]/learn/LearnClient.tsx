@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LearnClient({ course, enrollment, initialLessonId }: { course: any, enrollment: any, initialLessonId?: string }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'lessons' | 'materials' | 'quizzes'>('lessons');
   
   // State for what is currently being viewed
@@ -137,7 +139,7 @@ export default function LearnClient({ course, enrollment, initialLessonId }: { c
                 <button
                   type="button"
                   key={i}
-                  onClick={() => { setViewMode('quiz'); setCurrentQuiz(quiz); setQuizResult(null); setQuizAnswers({}); }}
+                  onClick={() => { router.push(`/courses/${course._id}/quiz/${i}`); }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
                     padding: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
