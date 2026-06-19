@@ -53,7 +53,7 @@ export default function CourseEditorPage() {
   const addQuiz = () => {
     setCourse({
       ...course,
-      quizzes: [...(course.quizzes || []), { title: 'اختبار جديد', timeLimit: 30, retakeAfterDays: 1, questions: [{ questionText: 'سؤال', options: ['خيار 1', 'خيار 2'], correctAnswer: 0 }] }]
+      quizzes: [...(course.quizzes || []), { title: 'اختبار جديد', timeLimit: 30, retakeAfterDays: 1, passingScore: 50, linkedLessonId: '', questions: [{ questionText: 'سؤال', options: ['خيار 1', 'خيار 2'], correctAnswer: 0 }] }]
     });
   };
 
@@ -202,6 +202,32 @@ export default function CourseEditorPage() {
                   newQuizzes[qIdx].retakeAfterDays = Number(e.target.value);
                   setCourse({...course, quizzes: newQuizzes});
                 }} />
+              </div>
+            </div>
+
+            <div className="grid-2" style={{ marginBottom: 20 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#ccc' }}>نسبة النجاح المطلوبة (%)</label>
+                <input type="number" min="1" max="100" style={inputStyle} value={quiz.passingScore ?? 50} onChange={e => {
+                  const newQuizzes = [...course.quizzes];
+                  newQuizzes[qIdx].passingScore = Number(e.target.value);
+                  setCourse({...course, quizzes: newQuizzes});
+                }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#ccc' }}>ربط الاختبار بدرس (شرط الاجتياز)</label>
+                <select style={{...inputStyle, padding: '11px'}} value={quiz.linkedLessonId || ''} onChange={e => {
+                  const newQuizzes = [...course.quizzes];
+                  newQuizzes[qIdx].linkedLessonId = e.target.value;
+                  setCourse({...course, quizzes: newQuizzes});
+                }}>
+                  <option value="">-- بدون ربط --</option>
+                  {course.lessons?.map((lesson: any) => (
+                    <option key={lesson._id || Math.random().toString()} value={lesson._id}>
+                      {lesson.title}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             

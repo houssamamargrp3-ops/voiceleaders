@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function LearnClient({ course, enrollment, initialLessonId }: { course: any, enrollment: any, initialLessonId?: string }) {
+export default function LearnClient({ course, enrollment, initialLessonId, passedQuizzes }: { course: any, enrollment: any, initialLessonId?: string, passedQuizzes?: Record<number, boolean> }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'lessons' | 'materials' | 'quizzes'>('lessons');
   
@@ -44,6 +44,27 @@ export default function LearnClient({ course, enrollment, initialLessonId }: { c
     }
   };
 
+  // Calculate locked lessons
+  const isLessonLocked = (lessonIndex: number) => {
+    if (lessonIndex === 0) return false; // First lesson is always unlocked
+    // A lesson is locked if ANY of the previous lessons has a linked quiz that wasn't passed
+    for (let i = 0; i < lessonIndex; i++) {
+      const prevLesson = course.lessons[i];
+      // Find quizzes linked to this previous lesson
+      const linkedQuizzesIndices = course.quizzes
+        ?.map((q: any, idx: number) => q.linkedLessonId === prevLesson._id ? idx : -1)
+        .filter((idx: number) => idx !== -1) || [];
+      
+      // If there are linked quizzes, ALL of them must be passed to proceed
+      for (const quizIdx of linkedQuizzesIndices) {
+        if (!passedQuizzes?.[quizIdx]) {
+          return true; // Previous lesson's quiz is not passed, so current lesson is locked
+        }
+      }
+    }
+    return false;
+  };
+
   const handleQuizSubmit = () => {
     if (!currentQuiz) return;
     let score = 0;
@@ -81,29 +102,67 @@ export default function LearnClient({ course, enrollment, initialLessonId }: { c
           {activeTab === 'lessons' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {course.lessons?.map((lesson: any, i: number) => {
-                const isCompleted = enrollment?.completedLessons?.includes(lesson._id);
-                const isActive = viewMode === 'video' && currentLessonId === lesson._id;
+                const isLocked = isLessonLocked(i);
                 
+                // Find quizzes linked to this lesson
+                const linkedQuizzes = course.quizzes?.map((q: any, idx: number) => ({...q, originalIndex: idx})).filter((q: any) => q.linkedLessonId === lesson._id) || [];
+
                 return (
-                  <button
-                    type="button"
-                    key={lesson._id}
-                    onClick={() => { setViewMode('video'); setCurrentLessonId(lesson._id); }}
-                    style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 12, width: '100%',
-                      padding: 14, background: isActive ? 'rgba(212,175,55,0.1)' : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${isActive ? 'rgba(212,175,55,0.3)' : 'rgba(255,255,255,0.05)'}`,
-                      borderRadius: 10, cursor: 'pointer', textAlign: 'right', transition: 'all 0.2s',
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: isCompleted ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.05)', color: isCompleted ? '#4ade80' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0 }}>
-                      {isCompleted ? '✓' : i + 1}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 600, color: isActive ? '#D4AF37' : '#ddd', marginBottom: 4 }}>{lesson.title}</div>
-                      <div style={{ fontSize: '0.7rem', color: '#666' }}>⏱️ {lesson.duration}</div>
-                    </div>
-                  </button>
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <button
+                      onClick={() => {
+                        if (!isLocked) {
+                          setCurrentLessonId(lesson._id);
+                          setViewMode('video');
+                        }
+                      }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12, padding: 12,
+                        background: currentLessonId === lesson._id && viewMode === 'video' ? 'rgba(212,175,55,0.1)' : 'transparent',
+                        border: '1px solid',
+                        borderColor: currentLessonId === lesson._id && viewMode === 'video' ? 'rgba(212,175,55,0.2)' : 'transparent',
+                        borderRadius: 8, cursor: isLocked ? 'not-allowed' : 'pointer', textAlign: 'right', transition: 'all 0.2s',
+                        opacity: isLocked ? 0.5 : 1,
+                      }}
+                    >
+                      <div style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        background: isLocked ? 'rgba(255,255,255,0.05)' : currentLessonId === lesson._id && viewMode === 'video' ? '#D4AF37' : 'rgba(255,255,255,0.05)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: currentLessonId === lesson._id && viewMode === 'video' ? '#000' : '#888',
+                        fontSize: '0.8rem', fontWeight: 700, flexShrink: 0
+                      }}>
+                        {isLocked ? '🔒' : (i + 1)}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.9rem', color: isLocked ? '#666' : currentLessonId === lesson._id && viewMode === 'video' ? '#D4AF37' : '#fff', fontWeight: currentLessonId === lesson._id && viewMode === 'video' ? 700 : 400 }}>
+                          {lesson.title}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>⏱️ {lesson.duration}</div>
+                      </div>
+                    </button>
+                    
+                    {/* Render Linked Quizzes Below the Lesson */}
+                    {!isLocked && linkedQuizzes.map((quiz: any, idx: number) => {
+                      const isPassed = passedQuizzes?.[quiz.originalIndex];
+                      return (
+                        <button
+                          key={`quiz-${quiz.originalIndex}`}
+                          onClick={() => router.push(`/courses/${course._id}/quiz/${quiz.originalIndex}`)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px 8px 32px',
+                            background: 'transparent', border: '1px dashed rgba(212,175,55,0.2)',
+                            borderRadius: 8, cursor: 'pointer', textAlign: 'right',
+                            marginLeft: 16, marginRight: 16,
+                          }}
+                        >
+                          <div style={{ fontSize: '0.8rem', color: isPassed ? '#4ade80' : '#D4AF37', fontWeight: 600 }}>
+                            {isPassed ? '✅' : '📝'} اختبار: {quiz.title}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 );
               })}
             </div>
@@ -162,17 +221,27 @@ export default function LearnClient({ course, enrollment, initialLessonId }: { c
         
         {viewMode === 'video' && currentLesson ? (
           <>
-            <div style={{ width: '100%', flex: 1, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {currentLesson.videoUrl ? (
-                <iframe
-                  src={getEmbedUrl(currentLesson.videoUrl)}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <div style={{ color: '#666' }}>لا يوجد رابط فيديو لهذا الدرس</div>
-              )}
+            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+            <iframe
+              src={getEmbedUrl(currentLesson.videoUrl)}
+              style={{ width: '100%', height: '100%', border: 'none' }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+            {isLessonLocked(course.lessons?.findIndex((l: any) => l._id === currentLesson._id)) && (
+              <div style={{
+                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', zIndex: 10
+              }}>
+                <div style={{ fontSize: '4rem', marginBottom: 20 }}>🔒</div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: 12 }}>الدرس مغلق</h2>
+                <p style={{ color: '#aaa', fontSize: '1rem', maxWidth: 400, textAlign: 'center' }}>
+                  يجب اجتياز الاختبار المرتبط بالدرس السابق بنجاح لتتمكن من مشاهدة هذا الدرس.
+                </p>
+              </div>
+            )}
             </div>
             <div style={{ padding: 24, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
               <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', marginBottom: 8 }}>{currentLesson.title}</h1>

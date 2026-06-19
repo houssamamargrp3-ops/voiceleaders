@@ -128,7 +128,8 @@ export default function QuizPage({ params }: { params: Promise<{ id: string; qui
   if (quizResult) {
     // Show Result
     const percentage = (quizResult.score / quizResult.totalQuestions) * 100;
-    const isPassed = percentage >= 50;
+    const passingScore = quiz.passingScore || 50;
+    const isPassed = percentage >= passingScore;
 
     return (
       <AppLayout>
@@ -139,8 +140,11 @@ export default function QuizPage({ params }: { params: Promise<{ id: string; qui
             <div style={{ fontSize: '3rem', fontWeight: 900, color: '#D4AF37', marginBottom: 20 }}>
               {quizResult.score} / {quizResult.totalQuestions}
             </div>
-            <p style={{ color: '#ccc', marginBottom: 30 }}>
-              {isPassed ? 'عمل رائع! لقد اجتزت الاختبار بنجاح.' : 'حاول مرة أخرى، يمكنك فعلها!'}
+            <p style={{ color: '#ccc', marginBottom: 10 }}>
+              نسبة النجاح المطلوبة: <strong style={{ color: '#fff' }}>{passingScore}%</strong> | نتيجتك: <strong style={{ color: isPassed ? '#4ade80' : '#f87171' }}>{percentage.toFixed(0)}%</strong>
+            </p>
+            <p style={{ color: '#ccc', marginBottom: 30, fontSize: '1.1rem' }}>
+              {isPassed ? 'عمل رائع! لقد اجتزت الاختبار بنجاح.' : 'حاول مرة أخرى، لم تصل لنسبة النجاح المطلوبة.'}
             </p>
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 12, marginBottom: 30, fontSize: '0.9rem', color: '#888' }}>
               يمكنك إعادة هذا الاختبار في:<br/>
@@ -164,7 +168,10 @@ export default function QuizPage({ params }: { params: Promise<{ id: string; qui
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '40px 20px', textAlign: 'center' }}>
           <div className="card" style={{ padding: 40, borderRadius: 20 }}>
             <h1 style={{ fontSize: '1.8rem', color: '#D4AF37', marginBottom: 10 }}>{quiz.title}</h1>
-            <p style={{ color: '#888', marginBottom: 30 }}>عدد الأسئلة: {quiz.questions.length} • الوقت للسؤال: {timeLimit} ثانية</p>
+            <div style={{ color: '#888', marginBottom: 30, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span>عدد الأسئلة: {quiz.questions.length} • الوقت للسؤال: {timeLimit} ثانية</span>
+              <span style={{ color: '#D4AF37', fontWeight: 600 }}>نسبة النجاح المطلوبة لاجتياز الاختبار: {quiz.passingScore || 50}%</span>
+            </div>
 
             {lastAttempt && (
               <div style={{ background: 'rgba(212,175,55,0.1)', padding: 16, borderRadius: 12, marginBottom: 30, border: '1px solid rgba(212,175,55,0.2)' }}>

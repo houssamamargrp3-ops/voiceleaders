@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import connectDB from '@/lib/connectDB';
 import Course from '@/models/Course';
 import Enrollment from '@/models/Enrollment';
+import QuizAttempt from '@/models/QuizAttempt';
 import { redirect } from 'next/navigation';
 import LearnClient from './LearnClient';
 
@@ -32,6 +33,19 @@ export default async function LearnPage({ params, searchParams }: { params: Prom
     redirect(`/courses/${course._id}`);
   }
 
+  // Fetch user's quiz attempts to determine passed quizzes
+  const quizAttempts = await QuizAttempt.find({
+    userId: session.user.id,
+    courseId: course._id,
+  }).lean();
+
+  const passedQuizzes: Record<number, boolean> = {};
+  course.quizzes?.forEach((quiz: any, index: number) => {
+    const attempts = quizAttempts.filter((a: any) => a.quizIndex === index);
+    const passingScore = quiz.passingScore || 50;
+    passedQuizzes[index] = attempts.some((a: any) => (a.score / a.totalQuestions) * 100 >= passingScore);
+  });
+
   // Pass data to client component for interactivity
   const serializedCourse = {
     ...course,
@@ -58,6 +72,7 @@ export default async function LearnPage({ params, searchParams }: { params: Prom
       course={serializedCourse} 
       enrollment={serializedEnrollment} 
       initialLessonId={resolvedSearchParams.lesson} 
+      passedQuizzes={passedQuizzes}
     />
   );
 }
