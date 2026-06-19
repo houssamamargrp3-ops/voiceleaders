@@ -9,6 +9,7 @@ export interface IChallenge extends Document {
   status: 'active' | 'closed' | 'upcoming';
   instructorId: mongoose.Types.ObjectId;
   participantsCount: number;
+  retakeAfterDays: number;
   submissions: any[];
   createdAt: Date;
   updatedAt: Date;
@@ -24,6 +25,7 @@ const ChallengeSchema: Schema = new Schema(
     status: { type: String, enum: ['active', 'closed', 'upcoming'], default: 'active' },
     instructorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     participantsCount: { type: Number, default: 0 },
+    retakeAfterDays: { type: Number, default: 7 }, // Default 7 days
     submissions: { type: Array, default: [] },
   },
   { timestamps: true }

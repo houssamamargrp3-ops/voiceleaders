@@ -127,7 +127,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'lessons' | 'reviews' | 'evaluation'>('lessons');
+  const [activeTab, setActiveTab] = useState<'lessons' | 'reviews' | 'evaluation' | 'quizzes'>('lessons');
   const [enrolling, setEnrolling] = useState(false);
   const [completingLesson, setCompletingLesson] = useState<string | null>(null);
 
@@ -477,13 +477,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         {/* Tabs */}
         <div className="tabs" style={{ marginBottom: 24 }}>
           {[
-            { id: 'lessons' as const, label: `📖 محتوى الدورة (${course.lessons?.length || 0})` },
-            { id: 'evaluation' as const, label: '📤 إرسال للتقييم' },
-            { id: 'reviews' as const, label: `⭐ التقييمات (${course.reviews?.length || 0})` },
+            { id: 'lessons' as const, label: `📖 الدروس (${course.lessons?.length || 0})` },
+            { id: 'quizzes' as const, label: `📝 الاختبارات (${course.quizzes?.length || 0})` },
+            { id: 'evaluation' as const, label: '📤 تقييم المدرب' },
+            { id: 'reviews' as const, label: `⭐ آراء المتدربين (${course.reviews?.length || 0})` },
           ].map(tab => (
             <button key={tab.id}
               className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id as 'lessons' | 'reviews' | 'evaluation')}>
+              onClick={() => setActiveTab(tab.id as 'lessons' | 'reviews' | 'evaluation' | 'quizzes')}>
               {tab.label}
             </button>
           ))}
@@ -601,6 +602,47 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               }}>
                 <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📝</div>
                 <p>لم يتم إضافة دروس بعد</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Quizzes Tab */}
+        {activeTab === 'quizzes' && (
+          <div style={{ animation: 'fadeInUp 0.4s ease' }}>
+            {course.quizzes && course.quizzes.length > 0 ? (
+              course.quizzes.map((quiz: any, i: number) => (
+                <div key={i} style={{
+                  background: 'rgba(255,255,255,0.02)', padding: 20,
+                  borderRadius: 12, marginBottom: 16,
+                  border: '1px solid rgba(212,175,55,0.15)',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  flexWrap: 'wrap', gap: 16
+                }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: 6 }}>{quiz.title}</h3>
+                    <div style={{ fontSize: '0.8rem', color: '#888', display: 'flex', gap: 12 }}>
+                      <span>📝 {quiz.questions?.length || 0} أسئلة</span>
+                      <span>⏱️ {quiz.timeLimit || 30} ثانية للسؤال</span>
+                    </div>
+                  </div>
+                  {(isEnrolled || isInstructor) ? (
+                    <Link href={`/courses/${course._id}/quiz/${i}`} className="btn-outline" style={{ fontSize: '0.85rem', padding: '8px 20px', textDecoration: 'none' }}>
+                      ▶️ بدء الاختبار
+                    </Link>
+                  ) : (
+                    <span style={{ fontSize: '0.8rem', color: '#666' }}>سجل بالدورة لاجتياز الاختبار</span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div style={{
+                textAlign: 'center', padding: '40px 20px', color: '#555',
+                background: 'rgba(255,255,255,0.02)', borderRadius: 16,
+                border: '1px solid rgba(255,255,255,0.04)',
+              }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📝</div>
+                <p>لم يتم إضافة اختبارات بعد</p>
               </div>
             )}
           </div>

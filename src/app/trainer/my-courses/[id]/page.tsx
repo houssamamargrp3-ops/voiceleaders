@@ -53,7 +53,7 @@ export default function CourseEditorPage() {
   const addQuiz = () => {
     setCourse({
       ...course,
-      quizzes: [...(course.quizzes || []), { title: 'اختبار جديد', questions: [{ questionText: 'سؤال', options: ['خيار 1', 'خيار 2'], correctAnswer: 0 }] }]
+      quizzes: [...(course.quizzes || []), { title: 'اختبار جديد', timeLimit: 30, retakeAfterDays: 1, questions: [{ questionText: 'سؤال', options: ['خيار 1', 'خيار 2'], correctAnswer: 0 }] }]
     });
   };
 
@@ -185,6 +185,25 @@ export default function CourseEditorPage() {
               newQuizzes[qIdx].title = e.target.value;
               setCourse({...course, quizzes: newQuizzes});
             }} />
+            
+            <div className="grid-2" style={{ marginBottom: 20 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#ccc' }}>الوقت المخصص لكل سؤال (بالثواني)</label>
+                <input type="number" min="5" max="300" style={inputStyle} value={quiz.timeLimit ?? 30} onChange={e => {
+                  const newQuizzes = [...course.quizzes];
+                  newQuizzes[qIdx].timeLimit = Number(e.target.value);
+                  setCourse({...course, quizzes: newQuizzes});
+                }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: '0.85rem', color: '#ccc' }}>مدة الانتظار لإعادة الاختبار (بالأيام)</label>
+                <input type="number" min="0" max="365" style={inputStyle} value={quiz.retakeAfterDays ?? 1} onChange={e => {
+                  const newQuizzes = [...course.quizzes];
+                  newQuizzes[qIdx].retakeAfterDays = Number(e.target.value);
+                  setCourse({...course, quizzes: newQuizzes});
+                }} />
+              </div>
+            </div>
             
             <h4 style={{ fontSize: '0.9rem', marginBottom: 10, color: '#ccc' }}>الأسئلة:</h4>
             {quiz.questions?.map((q: any, i: number) => (

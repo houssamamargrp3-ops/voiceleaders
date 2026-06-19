@@ -24,6 +24,8 @@ export interface ICourse extends Document {
   }[];
   quizzes: {
     title: string;
+    timeLimit: number;
+    retakeAfterDays: number;
     questions: {
       questionText: string;
       options: string[];
@@ -74,6 +76,8 @@ const CourseSchema = new Schema<ICourse>(
     quizzes: [
       {
         title: { type: String, required: true },
+        timeLimit: { type: Number, default: 30 },
+        retakeAfterDays: { type: Number, default: 1 },
         questions: [
           {
             questionText: { type: String, required: true },
