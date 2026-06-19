@@ -7,6 +7,7 @@ import Video from '@/models/Video';
 import AppLayout from '@/components/layout/AppLayout';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -187,6 +188,12 @@ export default async function ProfilePage() {
           )}
 
         </div>
+        
+        {/* Logout Button for Mobile */}
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <LogoutButton />
+        </div>
+
       </div>
     </AppLayout>
   );
