@@ -109,7 +109,7 @@ export default function Sidebar() {
                 ⚙️
               </Link>
               <button 
-                onClick={() => import('next-auth/react').then(m => m.signOut())} 
+                onClick={() => import('next-auth/react').then(m => m.signOut({ callbackUrl: '/auth/login' }))} 
                 title="تسجيل الخروج"
                 style={{
                   background: 'none', border: 'none', color: '#f87171', fontSize: '0.9rem', cursor: 'pointer',
