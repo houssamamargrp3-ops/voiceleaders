@@ -14,7 +14,13 @@ export async function GET(req: NextRequest) {
     }
 
     await connectDB();
-    const courses = await Course.find({ instructorId: session.user.id }).sort({ createdAt: -1 });
+    
+    let courses;
+    if (role === 'admin') {
+      courses = await Course.find({}).sort({ createdAt: -1 });
+    } else {
+      courses = await Course.find({ instructorId: session.user.id }).sort({ createdAt: -1 });
+    }
 
     return NextResponse.json({ courses });
   } catch (error) {
