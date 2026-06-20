@@ -10,26 +10,26 @@ export default function MobileTabBar() {
   const role = user?.role || 'trainee';
 
   const traineeTabs = [
-    { href: '/dashboard', label: 'الرئيسية', icon: '🏠' },
+    { href: '/feed', label: 'الرئيسية', icon: '🏠' },
+    { href: '/community', label: 'استكشف', icon: '🎥' },
     { href: '/courses', label: 'دورات', icon: '📚' },
-    { href: '/evaluations', label: 'تقييماتي', icon: '📝' },
     { href: '/challenges', label: 'تحديات', icon: '🏆' },
     { href: '/profile', label: 'حسابي', icon: '👤' },
   ];
 
   const trainerTabs = [
-    { href: '/dashboard', label: 'الرئيسية', icon: '🏠' },
-    { href: '/trainer/my-courses', label: 'دوراتي', icon: '👨‍🏫' },
+    { href: '/feed', label: 'الرئيسية', icon: '🏠' },
+    { href: '/community', label: 'استكشف', icon: '🎥' },
     { href: '/trainer/evaluations', label: 'تقييمات', icon: '📋' },
     { href: '/trainer/challenges', label: 'تحديات', icon: '🏆' },
     { href: '/profile', label: 'حسابي', icon: '👤' },
   ];
 
   const adminTabs = [
-    { href: '/dashboard', label: 'الرئيسية', icon: '🏠' },
+    { href: '/feed', label: 'الرئيسية', icon: '🏠' },
+    { href: '/community', label: 'استكشف', icon: '🎥' },
     { href: '/admin', label: 'التحكم', icon: '⚙️' },
     { href: '/admin/users', label: 'المستخدمون', icon: '👥' },
-    { href: '/trainer/challenges', label: 'تحديات', icon: '🏆' },
     { href: '/profile', label: 'حسابي', icon: '👤' },
   ];
 
@@ -38,7 +38,10 @@ export default function MobileTabBar() {
   return (
     <nav className="mobile-tabbar">
       {tabs.map(tab => {
-        const isActive = pathname === tab.href || (tab.href !== '/dashboard' && tab.href !== '/profile' && pathname.startsWith(tab.href));
+        // Special case to prevent `/feed` from matching `/` exactly if needed, but it's specific
+        const isActive = pathname === tab.href || 
+                         (tab.href !== '/feed' && tab.href !== '/profile' && pathname.startsWith(tab.href + '/'));
+        
         return (
           <Link key={tab.href} href={tab.href} className={`tab-item ${isActive ? 'active' : ''}`}>
             <div style={{

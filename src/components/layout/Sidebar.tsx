@@ -4,17 +4,17 @@ import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 const traineeLinks = [
-  { href: '/dashboard', label: 'الرئيسية', icon: '🏠' },
-  { href: '/feed', label: 'مجتمع الفيديو', icon: '🎥' },
+  { href: '/feed', label: 'الرئيسية', icon: '🏠' },
+  { href: '/community', label: 'استكشف', icon: '🎥' },
   { href: '/courses', label: 'الدورات', icon: '📚' },
   { href: '/evaluations', label: 'تقييماتي', icon: '📝' },
   { href: '/challenges', label: 'التحديات', icon: '🏆' },
 ];
 
 const trainerLinks = [
-  { href: '/dashboard', label: 'الرئيسية', icon: '🏠' },
+  { href: '/feed', label: 'الرئيسية', icon: '🏠' },
+  { href: '/community', label: 'استكشف', icon: '🎥' },
   { href: '/trainer/my-courses', label: 'إدارة دوراتي', icon: '👨‍🏫' },
-  { href: '/trainer/students', label: 'إدارة المتدربين', icon: '👥' },
   { href: '/trainer/evaluations', label: 'طلبات التقييم', icon: '📋' },
   { href: '/trainer/challenges', label: 'إدارة التحديات', icon: '🏆' },
 ];
@@ -45,7 +45,7 @@ export default function Sidebar() {
           <Link
             key={link.href}
             href={link.href}
-            className={`sidebar-link ${pathname === link.href || (link.href !== '/dashboard' && link.href !== '/feed' && pathname.startsWith(link.href + '/')) ? 'active' : ''}`}
+            className={`sidebar-link ${pathname === link.href || (link.href !== '/feed' && link.href !== '/community' && pathname.startsWith(link.href + '/')) ? 'active' : ''}`}
           >
             <span style={{ fontSize: '1rem' }}>{link.icon}</span>
             <span>{link.label}</span>
