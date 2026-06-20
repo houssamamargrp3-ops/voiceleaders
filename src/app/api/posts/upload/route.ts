@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
 
   // 5. إنشاء المنشور
   const post = await Post.create({
-    userId: session.user.id,
-    userName: session.user.name,
+    userId: (session.user as any).id,
+    userName: (session.user as any).name || 'مجهول',
     userAvatar: user?.avatar || '',
     userLevel: user?.level || 'beginner',
     title: title.trim(),

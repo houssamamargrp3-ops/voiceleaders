@@ -90,7 +90,7 @@ const ScoreEntrySchema = new Schema<IScoreEntry>(
 );
 
 // حساب المتوسط تلقائياً قبل الحفظ
-ScoreEntrySchema.pre('save', function (next) {
+ScoreEntrySchema.pre('save', function (next: any) {
   this.average =
     (this.clarity + this.confidence + this.structure + this.engagement) / 4;
   next();
@@ -139,7 +139,7 @@ const SessionSchema = new Schema<ISession>(
 // ─────────────────────────────────────────────
 //  Middleware: حساب overallAverage عند إضافة score
 // ─────────────────────────────────────────────
-SessionSchema.pre('save', function (next) {
+SessionSchema.pre('save', function (next: any) {
   if (this.scores && this.scores.length > 0) {
     const total = this.scores.reduce((sum, s) => sum + s.average, 0);
     this.overallAverage = parseFloat((total / this.scores.length).toFixed(2));

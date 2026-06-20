@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
   // 6. التحقق من عدم التكرار
   const alreadyIn = room.participants.some(
-    (p) => p.userId.toString() === session.user.id
+    (p) => p.userId.toString() === (session.user as any).id
   );
   if (alreadyIn) {
     return NextResponse.json({ error: 'أنت بالفعل في هذه الغرفة', room }, { status: 200 });
@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
 
   // 8. إضافة المستخدم للغرفة
   room.participants.push({
-    userId: session.user.id as unknown as import('mongoose').Types.ObjectId,
-    name: session.user.name || 'مجهول',
+    userId: (session.user as any).id as unknown as import('mongoose').Types.ObjectId,
+    name: (session.user as any).name || 'مجهول',
     role: role || 'audience',
     joinedAt: new Date(),
   });

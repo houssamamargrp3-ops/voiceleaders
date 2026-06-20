@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
   // 4. التحقق أن المستخدم مشارك بدور "speaker"
   const participant = room.participants.find(
-    (p) => p.userId.toString() === session.user.id && p.role === 'speaker'
+    (p) => p.userId.toString() === (session.user as any).id && p.role === 'speaker'
   );
   if (!participant) {
     return NextResponse.json({ error: 'لست متحدثاً في هذه الغرفة' }, { status: 403 });
@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
   // 5. إنشاء الجلسة
   const speakingSession = await Session.create({
     roomId,
-    speakerId: session.user.id,
-    speakerName: session.user.name,
+    speakerId: (session.user as any).id,
+    speakerName: (session.user as any).name || 'مجهول',
     topic: topic.trim(),
     startedAt: new Date(),
     completed: false,

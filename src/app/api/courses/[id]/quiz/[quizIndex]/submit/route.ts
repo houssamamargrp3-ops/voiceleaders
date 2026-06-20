@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/connectDB';
 import Course from '@/models/Course';
 import QuizAttempt from '@/models/QuizAttempt';
+import Enrollment from '@/models/Enrollment';
 import { auth } from '@/auth';
 
 export async function POST(
@@ -71,11 +72,31 @@ export async function POST(
       nextRetakeAt
     });
 
+    // Calculate passing logic
+    const scorePercentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+    const passed = scorePercentage >= (quiz.passingScore || 50);
+
+    if (passed) {
+      let enrollment = await Enrollment.findOne({ courseId, userId: session.user.id });
+      if (enrollment) {
+        const existingPass = enrollment.passedQuizzes?.find((q: any) => q.quizIndex === quizIndex);
+        if (!existingPass) {
+          enrollment.passedQuizzes = enrollment.passedQuizzes || [];
+          enrollment.passedQuizzes.push({ quizIndex, score: scorePercentage });
+          await enrollment.save();
+        } else if (scorePercentage > existingPass.score) {
+          existingPass.score = scorePercentage;
+          await enrollment.save();
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       score,
       totalQuestions,
-      nextRetakeAt
+      nextRetakeAt,
+      passed
     });
   } catch (error) {
     console.error('Quiz submit error:', error);

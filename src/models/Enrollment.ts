@@ -4,6 +4,7 @@ export interface IEnrollment extends Document {
   userId: mongoose.Types.ObjectId;
   courseId: mongoose.Types.ObjectId;
   completedLessons: string[];
+  passedQuizzes: { quizIndex: number; score: number }[];
   progress: number;
   enrolledAt: Date;
   lastAccessedAt: Date;
@@ -14,6 +15,12 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
     completedLessons: [{ type: String }],
+    passedQuizzes: [
+      {
+        quizIndex: { type: Number, required: true },
+        score: { type: Number, required: true }
+      }
+    ],
     progress: { type: Number, default: 0, min: 0, max: 100 },
     enrolledAt: { type: Date, default: Date.now },
     lastAccessedAt: { type: Date, default: Date.now },

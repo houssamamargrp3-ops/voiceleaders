@@ -61,13 +61,13 @@ export async function POST(request: NextRequest) {
   }
 
   // 5. منع تقييم النفس
-  if (session.speakerId.toString() === authSession.user.id) {
+  if (session.speakerId.toString() === (authSession.user as any).id) {
     return NextResponse.json({ error: 'لا يمكنك تقييم نفسك' }, { status: 400 });
   }
 
   // 6. منع التقييم المزدوج
   const alreadyScored = session.scores.some(
-    (s) => s.evaluatorId.toString() === authSession.user.id
+    (s) => s.evaluatorId.toString() === (authSession.user as any).id
   );
   if (alreadyScored) {
     return NextResponse.json({ error: 'لقد قدّمت تقييمك لهذه الجلسة بالفعل' }, { status: 409 });
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
   // 7. إضافة التقييم
   const avg = parseFloat(((clarity + confidence + structure + engagement) / 4).toFixed(2));
   session.scores.push({
-    evaluatorId: authSession.user.id as unknown as import('mongoose').Types.ObjectId,
-    evaluatorName: authSession.user.name || 'مقيّم',
+    evaluatorId: (authSession.user as any).id as unknown as import('mongoose').Types.ObjectId,
+    evaluatorName: (authSession.user as any).name || 'مقيّم',
     clarity,
     confidence,
     structure,

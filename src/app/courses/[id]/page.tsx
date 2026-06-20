@@ -34,6 +34,7 @@ interface Course {
   tags: string[];
   featured: boolean;
   lessons: Lesson[];
+  quizzes?: any[];
   enrolledStudents: string[];
   rating: number;
   ratingsCount: number;
@@ -47,6 +48,7 @@ interface Enrollment {
   userId: string;
   courseId: string;
   completedLessons: string[];
+  passedQuizzes?: { quizIndex: number; score: number }[];
   progress: number;
   enrolledAt: string;
   lastAccessedAt: string;
@@ -303,9 +305,28 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   }
 
   const sortedLessons = [...(course.lessons || [])].sort((a, b) => a.order - b.order);
-  const role = session?.user?.role || 'trainee';
-  const isInstructor = role === 'admin' || (role === 'trainer' && course?.instructorId === session?.user?.id);
+  const role = (session?.user as any)?.role || 'trainee';
+  const isInstructor = role === 'admin' || (role === 'trainer' && course?.instructorId === (session?.user as any)?.id);
   const isEnrolled = !!enrollment;
+
+  const isLessonLocked = (lessonIndex: number) => {
+    if (lessonIndex === 0) return false;
+    if (isInstructor) return false;
+    if (!enrollment) return false;
+    
+    for (let prevIdx = 0; prevIdx < lessonIndex; prevIdx++) {
+      const prevLesson = sortedLessons[prevIdx];
+      const linkedQuizzes = course.quizzes?.filter((q: any) => q.linkedLessonId === prevLesson._id) || [];
+      for (const quiz of linkedQuizzes) {
+        const quizIndex = course.quizzes?.findIndex((q: any) => q._id === quiz._id);
+        const hasPassed = enrollment.passedQuizzes?.some((pq: any) => pq.quizIndex === quizIndex);
+        if (!hasPassed) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
 
   return (
     <AppLayout>
@@ -497,37 +518,53 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               sortedLessons.map((lesson, i) => {
                 const isCompleted = enrollment?.completedLessons?.includes(lesson._id) || false;
                 const isToggling = completingLesson === lesson._id;
+                const isLocked = isLessonLocked(i);
                 return (
                   <div
                     key={lesson._id}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 14,
                       padding: 16,
-                      background: isCompleted ? 'rgba(74,222,128,0.04)' : 'rgba(255,255,255,0.02)',
+                      background: isLocked ? 'rgba(255,255,255,0.01)' : isCompleted ? 'rgba(74,222,128,0.04)' : 'rgba(255,255,255,0.02)',
                       borderRadius: 12, marginBottom: 8,
-                      border: `1px solid ${isCompleted ? 'rgba(74,222,128,0.12)' : 'rgba(255,255,255,0.04)'}`,
+                      border: `1px solid ${isLocked ? 'rgba(255,255,255,0.02)' : isCompleted ? 'rgba(74,222,128,0.12)' : 'rgba(255,255,255,0.04)'}`,
                       transition: 'all 0.2s ease',
                       animation: `fadeInUp 0.4s ease ${i * 0.05}s both`,
+                      opacity: isLocked ? 0.5 : 1,
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.background = isCompleted
-                        ? 'rgba(74,222,128,0.08)'
-                        : 'rgba(212,175,55,0.04)';
-                      e.currentTarget.style.borderColor = isCompleted
-                        ? 'rgba(74,222,128,0.2)'
-                        : 'rgba(212,175,55,0.15)';
+                      if (!isLocked) {
+                        e.currentTarget.style.background = isCompleted
+                          ? 'rgba(74,222,128,0.08)'
+                          : 'rgba(212,175,55,0.04)';
+                        e.currentTarget.style.borderColor = isCompleted
+                          ? 'rgba(74,222,128,0.2)'
+                          : 'rgba(212,175,55,0.15)';
+                      }
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.background = isCompleted
-                        ? 'rgba(74,222,128,0.04)'
-                        : 'rgba(255,255,255,0.02)';
-                      e.currentTarget.style.borderColor = isCompleted
-                        ? 'rgba(74,222,128,0.12)'
-                        : 'rgba(255,255,255,0.04)';
+                      if (!isLocked) {
+                        e.currentTarget.style.background = isCompleted
+                          ? 'rgba(74,222,128,0.04)'
+                          : 'rgba(255,255,255,0.02)';
+                        e.currentTarget.style.borderColor = isCompleted
+                          ? 'rgba(74,222,128,0.12)'
+                          : 'rgba(255,255,255,0.04)';
+                      }
                     }}
                   >
                     {/* Lesson completion checkbox (only if enrolled) */}
-                    {(isEnrolled && !isInstructor) ? (
+                    {isLocked ? (
+                      <div style={{
+                        width: 34, height: 34, borderRadius: 8,
+                        background: 'rgba(255,255,255,0.02)',
+                        border: '1.5px solid rgba(255,255,255,0.05)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '0.85rem', flexShrink: 0, color: '#666',
+                      }}>
+                        🔒
+                      </div>
+                    ) : (isEnrolled && !isInstructor) ? (
                       <button
                         onClick={() => handleToggleLesson(lesson._id, isCompleted)}
                         disabled={isToggling}
@@ -555,7 +592,15 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       </div>
                     )}
                     <div style={{ flex: 1 }}>
-                      {(isEnrolled || isInstructor) ? (
+                      {isLocked ? (
+                        <div style={{
+                          fontSize: '0.875rem', fontWeight: 500,
+                          color: '#666',
+                          cursor: 'not-allowed'
+                        }}>
+                          {lesson.title} (مغلق - يتطلب اجتياز اختبار الدرس السابق 🔒)
+                        </div>
+                      ) : (isEnrolled || isInstructor) ? (
                         <Link href={`/courses/${course._id}/learn?lesson=${lesson._id}`} style={{ textDecoration: 'none' }}>
                           <div style={{
                             fontSize: '0.875rem', fontWeight: 600,
@@ -584,11 +629,17 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       </div>
                     </div>
                     {(isEnrolled || isInstructor) && (
-                      <Link href={`/courses/${course._id}/learn?lesson=${lesson._id}`} className="btn-outline" style={{ fontSize: '0.75rem', padding: '6px 12px', border: '1px solid rgba(212,175,55,0.3)' }}>
-                        شاهد الدرس
-                      </Link>
+                      isLocked ? (
+                        <button disabled className="btn-outline" style={{ fontSize: '0.75rem', padding: '6px 12px', border: '1px solid rgba(255,255,255,0.05)', color: '#555', cursor: 'not-allowed' }}>
+                          مغلق 🔒
+                        </button>
+                      ) : (
+                        <Link href={`/courses/${course._id}/learn?lesson=${lesson._id}`} className="btn-outline" style={{ fontSize: '0.75rem', padding: '6px 12px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                          شاهد الدرس
+                        </Link>
+                      )
                     )}
-                    {isCompleted && (
+                    {isCompleted && !isLocked && (
                       <span style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 600 }}>مكتمل ✓</span>
                     )}
                   </div>

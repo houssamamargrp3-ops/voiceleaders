@@ -222,13 +222,7 @@ export default function LearnClient({ course, enrollment, initialLessonId, passe
         {viewMode === 'video' && currentLesson ? (
           <>
             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-            <iframe
-              src={getEmbedUrl(currentLesson.videoUrl)}
-              style={{ width: '100%', height: '100%', border: 'none' }}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-            {isLessonLocked(course.lessons?.findIndex((l: any) => l._id === currentLesson._id)) && (
+            {isLessonLocked(course.lessons?.findIndex((l: any) => l._id === currentLesson._id)) ? (
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                 background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)',
@@ -241,6 +235,13 @@ export default function LearnClient({ course, enrollment, initialLessonId, passe
                   يجب اجتياز الاختبار المرتبط بالدرس السابق بنجاح لتتمكن من مشاهدة هذا الدرس.
                 </p>
               </div>
+            ) : (
+              <iframe
+                src={getEmbedUrl(currentLesson.videoUrl)}
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             )}
             </div>
             <div style={{ padding: 24, borderTop: '1px solid rgba(255,255,255,0.05)' }}>

@@ -52,13 +52,13 @@ export async function POST(request: NextRequest) {
     isPrivate: isPrivate || false,
     accessCode: isPrivate ? accessCode || '' : '',
     durationMinutes: durationMinutes || null,
-    hostId: session.user.id,
-    hostName: session.user.name,
+    hostId: (session.user as any).id,
+    hostName: (session.user as any).name || 'مجهول',
     status: 'waiting',
     participants: [
       {
-        userId: session.user.id,
-        name: session.user.name,
+        userId: (session.user as any).id,
+        name: (session.user as any).name || 'مجهول',
         role: 'speaker', // المضيف يبدأ كمتحدث
         joinedAt: new Date(),
       },
