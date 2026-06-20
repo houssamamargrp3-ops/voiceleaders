@@ -15,6 +15,7 @@ const trainerLinks = [
   { href: '/feed', label: 'الرئيسية', icon: '🏠' },
   { href: '/community', label: 'استكشف', icon: '🎥' },
   { href: '/trainer/my-courses', label: 'إدارة دوراتي', icon: '👨‍🏫' },
+  { href: '/trainer/students', label: 'إدارة المتدربين', icon: '👥' },
   { href: '/trainer/evaluations', label: 'طلبات التقييم', icon: '📋' },
   { href: '/trainer/challenges', label: 'إدارة التحديات', icon: '🏆' },
 ];
