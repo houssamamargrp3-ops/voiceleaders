@@ -3,59 +3,77 @@ import { auth } from '@/auth';
 import connectDB from '@/lib/connectDB';
 import Challenge from '@/models/Challenge';
 
+/**
+ * GET /api/trainer/challenges
+ * جلب تحديات المدرب
+ */
 export async function GET(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const role = (session.user as any).role;
-    if (role !== 'trainer' && role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    await connectDB();
-
-    const query = role === 'admin' ? {} : { instructorId: session.user.id };
-    const challenges = await Challenge.find(query).sort({ createdAt: -1 }).lean();
-
-    // Map challenges to include id string instead of _id
-    const mapped = challenges.map((c: any) => ({
-      ...c,
-      id: c._id.toString(),
-      _id: undefined,
-      instructorId: c.instructorId.toString(),
-    }));
-
-    return NextResponse.json({ success: true, challenges: mapped });
-  } catch (error) {
-    console.error('Fetch challenges error:', error);
-    return NextResponse.json({ error: 'Failed to fetch challenges' }, { status: 500 });
+  const role = (session.user as any).role;
+  if (role !== 'trainer' && role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+
+  await connectDB();
+
+  // Admin يرى الكل، Trainer يرى ما أنشأه فقط
+  const query = role === 'admin' ? {} : { createdBy: session.user.id };
+  const challenges = await Challenge.find(query).sort({ createdAt: -1 }).lean();
+
+  const mapped = challenges.map((c: any) => ({
+    ...c,
+    id: c._id.toString(),
+    createdBy: c.createdBy?.toString(),
+    _id: undefined,
+  }));
+
+  return NextResponse.json({ success: true, challenges: mapped });
 }
 
+/**
+ * POST /api/trainer/challenges
+ * إنشاء تحدي جديد
+ */
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const role = (session.user as any).role;
-    if (role !== 'trainer' && role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const data = await req.json();
-    await connectDB();
-
-    const challenge = new Challenge({
-      ...data,
-      instructorId: session.user.id,
-    });
-
-    await challenge.save();
-
-    return NextResponse.json({ success: true, challenge });
-  } catch (error) {
-    console.error('Create challenge error:', error);
-    return NextResponse.json({ error: 'Failed to create challenge' }, { status: 500 });
+  const role = (session.user as any).role;
+  if (role !== 'trainer' && role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+
+  const data = await req.json();
+  const { title, description, prompt, difficulty, type, deadline, pointsReward,
+    minDurationSeconds, maxDurationSeconds, tags, prize, retakeAfterDays, status } = data;
+
+  if (!title?.trim() || !description?.trim() || !prompt?.trim() || !deadline) {
+    return NextResponse.json(
+      { error: 'العنوان، الوصف، الموضوع، وتاريخ الانتهاء مطلوبون' },
+      { status: 400 }
+    );
+  }
+
+  await connectDB();
+
+  const challenge = await Challenge.create({
+    title: title.trim(),
+    description: description.trim(),
+    prompt: prompt.trim(),
+    difficulty: difficulty || 'medium',
+    type: type || 'daily',
+    createdBy: session.user.id,
+    deadline: new Date(deadline),
+    status: status || 'upcoming',
+    pointsReward: pointsReward || 50,
+    minDurationSeconds: minDurationSeconds || 60,
+    maxDurationSeconds: maxDurationSeconds || 300,
+    tags: tags || [],
+    prize: prize || '',
+    retakeAfterDays: retakeAfterDays || 7,
+  });
+
+  return NextResponse.json({ success: true, challenge }, { status: 201 });
 }

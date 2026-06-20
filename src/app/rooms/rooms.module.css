@@ -1,0 +1,226 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--dark-bg, #0F0F1A);
+  color: #fff;
+  font-family: var(--font-cairo), sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 5%;
+  background-color: var(--card-bg, #1A1A2E);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerTitle h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.headerTitle p {
+  margin: 0;
+  color: #9CA3AF;
+}
+
+.createBtn {
+  background: var(--primary, #7C3AED);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.createBtn:hover {
+  background: #6D28D9;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 5%;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.filterBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #D1D5DB;
+  padding: 0.5rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.filterBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.filterBtn.active {
+  background: var(--primary, #7C3AED);
+  border-color: var(--primary, #7C3AED);
+  color: white;
+  font-weight: bold;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: #9CA3AF;
+  font-size: 1.25rem;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 1rem;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.emptyState h2 {
+  margin: 0 0 1rem 0;
+  color: #fff;
+}
+
+.emptyState p {
+  color: #9CA3AF;
+  margin-bottom: 2rem;
+}
+
+.createBtnLarge {
+  background: var(--primary, #7C3AED);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.createBtnLarge:hover {
+  background: #6D28D9;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: rgba(26, 26, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.liveBadge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+.waitingBadge {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9CA3AF;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.typeIcon {
+  font-size: 0.875rem;
+  color: #D1D5DB;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.roomName {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.roomTopic {
+  margin: 0 0 1.5rem 0;
+  color: #9CA3AF;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #9CA3AF;
+}
+
+.joinBtn {
+  width: 100%;
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary, #7C3AED);
+  border: 1px solid var(--primary, #7C3AED);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.joinBtn:hover:not(:disabled) {
+  background: var(--primary, #7C3AED);
+  color: white;
+}
+
+.joinBtn:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: #6B7280;
+  border-color: rgba(255, 255, 255, 0.1);
+  cursor: not-allowed;
+}
