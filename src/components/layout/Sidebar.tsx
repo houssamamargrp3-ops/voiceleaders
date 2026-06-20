@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { logoutAction } from '@/app/actions/auth';
 
 const traineeLinks = [
   { href: '/feed', label: 'الرئيسية', icon: '🏠' },
@@ -109,18 +110,20 @@ export default function Sidebar() {
               }} onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = '#888'}>
                 ⚙️
               </Link>
-              <button 
-                onClick={() => import('next-auth/react').then(m => m.signOut({ callbackUrl: '/auth/login' }))} 
-                title="تسجيل الخروج"
-                style={{
-                  background: 'none', border: 'none', color: '#f87171', fontSize: '0.9rem', cursor: 'pointer',
-                  padding: '4px', transition: 'color 0.2s', opacity: 0.8
-                }} 
-                onMouseEnter={e => e.currentTarget.style.opacity = '1'} 
-                onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
-              >
-                🚪
-              </button>
+              <form action={logoutAction} style={{ margin: 0, display: 'flex' }}>
+                <button 
+                  type="submit"
+                  title="تسجيل الخروج"
+                  style={{
+                    background: 'none', border: 'none', color: '#f87171', fontSize: '0.9rem', cursor: 'pointer',
+                    padding: '4px', transition: 'color 0.2s', opacity: 0.8
+                  }} 
+                  onMouseEnter={e => e.currentTarget.style.opacity = '1'} 
+                  onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
+                >
+                  🚪
+                </button>
+              </form>
             </div>
           </div>
         ) : (
