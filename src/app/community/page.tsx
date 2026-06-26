@@ -66,7 +66,7 @@ export default function CommunityPage() {
           if (p.id === postId) {
             return {
               ...p,
-              comments: [...p.comments, data.comment]
+              comments: [...(p.comments || []), data.comment]
             };
           }
           return p;
@@ -130,6 +130,12 @@ export default function CommunityPage() {
                     <iframe
                       width="100%" height="100%"
                       src={`https://www.youtube.com/embed/${post.videoUrl.split('v=')[1]?.split('&')[0] || post.videoUrl.split('/').pop()}`}
+                      frameBorder="0" allowFullScreen
+                    />
+                  ) : post.videoUrl?.includes('drive.google.com') ? (
+                    <iframe
+                      width="100%" height="100%"
+                      src={post.videoUrl.replace('/view', '/preview')}
                       frameBorder="0" allowFullScreen
                     />
                   ) : (
