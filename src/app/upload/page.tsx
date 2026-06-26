@@ -59,6 +59,7 @@ export default function UploadPage() {
     };
 
     xhr.open('POST', '/api/videos/upload');
+    xhr.withCredentials = true; // IMPORTANT: send session cookies
     xhr.send(formData);
   };
 
