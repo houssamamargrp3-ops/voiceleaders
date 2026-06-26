@@ -219,7 +219,59 @@ function endRoom(io, roomId) {
 // ─── تشغيل الخادم ────────────────────────────
 
 app.prepare().then(() => {
-  const httpServer = createServer((req, res) => handle(req, res));
+  const fs = require('fs');
+  const path = require('path');
+  const httpServer = createServer((req, res) => {
+    // Serve dynamic uploaded files (Next.js standalone doesn't serve them natively)
+    if (req.url && req.url.startsWith('/uploads/')) {
+      try {
+        const urlPath = req.url.split('?')[0];
+        // Prevent path traversal
+        const safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, '');
+        const filePath = path.join(process.cwd(), 'public', safePath);
+        
+        fs.stat(filePath, (err, stat) => {
+          if (err || !stat.isFile()) return handle(req, res);
+          
+          const ext = path.extname(filePath).toLowerCase();
+          let contentType = 'application/octet-stream';
+          if (ext === '.mp4') contentType = 'video/mp4';
+          else if (ext === '.mov') contentType = 'video/quicktime';
+          else if (ext === '.avi') contentType = 'video/x-msvideo';
+          else if (ext === '.png') contentType = 'image/png';
+          else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+
+          const range = req.headers.range;
+          if (range && (ext === '.mp4' || ext === '.mov')) {
+            const parts = range.replace(/bytes=/, "").split("-");
+            const partialstart = parts[0];
+            const partialend = parts[1];
+            const start = parseInt(partialstart, 10);
+            const end = partialend ? parseInt(partialend, 10) : stat.size - 1;
+            const chunksize = (end - start) + 1;
+            const fileStream = fs.createReadStream(filePath, {start, end});
+            res.writeHead(206, {
+              'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+              'Accept-Ranges': 'bytes',
+              'Content-Length': chunksize,
+              'Content-Type': contentType
+            });
+            fileStream.pipe(res);
+          } else {
+            res.writeHead(200, {
+              'Content-Length': stat.size,
+              'Content-Type': contentType
+            });
+            fs.createReadStream(filePath).pipe(res);
+          }
+        });
+        return;
+      } catch (e) {
+        return handle(req, res);
+      }
+    }
+    return handle(req, res);
+  });
 
   const io = new Server(httpServer, {
     cors: {
