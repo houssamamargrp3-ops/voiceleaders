@@ -142,8 +142,8 @@ export default function AdminUsersPage() {
             <p>لا يوجد مستخدمون{search ? ' بهذا البحث' : ' مسجّلون بعد'}</p>
             {!search && <p style={{ fontSize: '0.8rem', marginTop: 8, color: '#333' }}>تأكد من الاتصال بقاعدة البيانات</p>}
           </div>
-        ) : users.map((user, i) => (
-          <div key={user.id}
+        ) : users.map((user: any, i) => (
+          <div key={user._id || user.id}
             style={{
               display: 'grid', gridTemplateColumns: '1fr 200px 100px 100px 120px 80px',
               alignItems: 'center', padding: '14px 20px',
@@ -186,7 +186,7 @@ export default function AdminUsersPage() {
             <div style={{ textAlign: 'center' }}>
               <select
                 value={user.role}
-                onChange={(e) => updateRole(user.id, e.target.value)}
+                onChange={(e) => updateRole(user._id || user.id, e.target.value)}
                 style={{
                   background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 6, padding: '4px 8px', fontSize: '0.75rem', outline: 'none', cursor: 'pointer',
@@ -201,7 +201,7 @@ export default function AdminUsersPage() {
 
             {/* Actions */}
             <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-              <button onClick={() => deleteUser(user.id)} style={{
+              <button onClick={() => deleteUser(user._id || user.id)} style={{
                 padding: '4px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.08)',
                 border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', fontSize: '0.7rem', cursor: 'pointer',
               }}>حذف</button>
