@@ -555,13 +555,17 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                   >
                     {/* Lesson completion checkbox (only if enrolled) */}
                     {isLocked ? (
-                      <div style={{
-                        width: 34, height: 34, borderRadius: 8,
-                        background: 'rgba(255,255,255,0.02)',
-                        border: '1.5px solid rgba(255,255,255,0.05)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.85rem', flexShrink: 0, color: '#666',
-                      }}>
+                      <div
+                        onClick={() => alert('عليك اجتياز اختبار الدرس السابق لتتمكن من مشاهدة هذا الدرس 🔒')}
+                        style={{
+                          width: 34, height: 34, borderRadius: 8,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1.5px solid rgba(255,255,255,0.05)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '0.85rem', flexShrink: 0, color: '#666',
+                          cursor: 'pointer',
+                        }}
+                      >
                         🔒
                       </div>
                     ) : (isEnrolled && !isInstructor) ? (
@@ -593,11 +597,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                     )}
                     <div style={{ flex: 1 }}>
                       {isLocked ? (
-                        <div style={{
-                          fontSize: '0.875rem', fontWeight: 500,
-                          color: '#666',
-                          cursor: 'not-allowed'
-                        }}>
+                        <div 
+                          onClick={() => alert('عليك اجتياز اختبار الدرس السابق لتتمكن من مشاهدة هذا الدرس 🔒')}
+                          style={{
+                            fontSize: '0.875rem', fontWeight: 500,
+                            color: '#666',
+                            cursor: 'pointer'
+                          }}
+                        >
                           {lesson.title} (مغلق - يتطلب اجتياز اختبار الدرس السابق 🔒)
                         </div>
                       ) : (isEnrolled || isInstructor) ? (
@@ -630,7 +637,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                     </div>
                     {(isEnrolled || isInstructor) && (
                       isLocked ? (
-                        <button disabled className="btn-outline" style={{ fontSize: '0.75rem', padding: '6px 12px', border: '1px solid rgba(255,255,255,0.05)', color: '#555', cursor: 'not-allowed' }}>
+                        <button 
+                          onClick={() => alert('عليك اجتياز اختبار الدرس السابق لتتمكن من مشاهدة هذا الدرس 🔒')}
+                          className="btn-outline" 
+                          style={{ fontSize: '0.75rem', padding: '6px 12px', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', cursor: 'pointer' }}
+                        >
                           مغلق 🔒
                         </button>
                       ) : (

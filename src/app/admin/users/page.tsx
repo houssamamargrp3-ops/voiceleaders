@@ -65,6 +65,22 @@ export default function AdminUsersPage() {
     }
   };
 
+  const deleteUser = async (userId: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+    try {
+      const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'حدث خطأ أثناء الحذف');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('حدث خطأ أثناء الحذف');
+    }
+  };
+
   return (
     <AppLayout>
       {/* Header */}
@@ -185,7 +201,7 @@ export default function AdminUsersPage() {
 
             {/* Actions */}
             <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-              <button style={{
+              <button onClick={() => deleteUser(user.id)} style={{
                 padding: '4px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.08)',
                 border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', fontSize: '0.7rem', cursor: 'pointer',
               }}>حذف</button>

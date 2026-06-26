@@ -20,7 +20,7 @@ export default function CommunityPage() {
           setPosts(data.posts.map((p: any) => ({
             ...p,
             id: p._id.toString(),
-            hasLiked: p.likes.includes(userId),
+            hasLiked: p.likes?.includes(userId) || false,
           })));
         }
         setLoading(false);
@@ -126,14 +126,14 @@ export default function CommunityPage() {
 
                 {/* Video Player (or link) */}
                 <div style={{ background: '#000', width: '100%', aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {post.videoUrl.includes('youtube.com') || post.videoUrl.includes('youtu.be') ? (
+                  {post.videoUrl?.includes('youtube.com') || post.videoUrl?.includes('youtu.be') ? (
                     <iframe
                       width="100%" height="100%"
                       src={`https://www.youtube.com/embed/${post.videoUrl.split('v=')[1]?.split('&')[0] || post.videoUrl.split('/').pop()}`}
                       frameBorder="0" allowFullScreen
                     />
                   ) : (
-                    <video src={post.videoUrl} controls style={{ width: '100%', height: '100%' }} />
+                    <video src={post.videoUrl || ''} controls style={{ width: '100%', height: '100%' }} />
                   )}
                 </div>
 
