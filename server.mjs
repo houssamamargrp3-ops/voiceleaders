@@ -13,6 +13,9 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import next from 'next';
+import fs from 'fs';
+import path from 'path';
+
 
 const port = parseInt(process.env.PORT || '3000', 10);
 const dev  = process.env.NODE_ENV !== 'production';
@@ -219,8 +222,6 @@ function endRoom(io, roomId) {
 // ─── تشغيل الخادم ────────────────────────────
 
 app.prepare().then(() => {
-  const fs = require('fs');
-  const path = require('path');
   const httpServer = createServer((req, res) => {
     // Serve dynamic uploaded files (Next.js standalone doesn't serve them natively)
     if (req.url && req.url.startsWith('/uploads/')) {
