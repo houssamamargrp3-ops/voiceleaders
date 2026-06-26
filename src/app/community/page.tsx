@@ -135,7 +135,7 @@ export default function CommunityPage() {
                   ) : post.videoUrl?.includes('drive.google.com') ? (
                     <iframe
                       width="100%" height="100%"
-                      src={post.videoUrl.replace('/view', '/preview')}
+                      src={post.videoUrl.includes('/view') ? post.videoUrl.replace('/view', '/preview') : post.videoUrl.includes('id=') ? `https://drive.google.com/file/d/${post.videoUrl.split('id=')[1].split('&')[0]}/preview` : post.videoUrl}
                       frameBorder="0" allowFullScreen
                     />
                   ) : (
