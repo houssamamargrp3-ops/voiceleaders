@@ -6,22 +6,23 @@ import mongoose from 'mongoose';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     // يجب أن يكون المستخدم مشرفاً أو مدرباً على الأقل للقيام بهذا
     if (!session?.user || (session.user as any).role !== 'admin' && (session.user as any).role !== 'trainer') {
       return NextResponse.json({ success: false, error: 'غير مصرح' }, { status: 403 });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ success: false, error: 'معرف غير صالح' }, { status: 400 });
     }
 
     await connectDB();
 
-    const deletedUser = await User.findByIdAndDelete(params.id);
+    const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) {
       return NextResponse.json({ success: false, error: 'المستخدم غير موجود' }, { status: 404 });
