@@ -239,11 +239,13 @@ app.prepare().then(() => {
           if (ext === '.mp4') contentType = 'video/mp4';
           else if (ext === '.mov') contentType = 'video/quicktime';
           else if (ext === '.avi') contentType = 'video/x-msvideo';
+          else if (ext === '.webm') contentType = 'video/webm';
+          else if (ext === '.ogg') contentType = 'video/ogg';
           else if (ext === '.png') contentType = 'image/png';
           else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
 
           const range = req.headers.range;
-          if (range && (ext === '.mp4' || ext === '.mov')) {
+          if (range && (ext === '.mp4' || ext === '.mov' || ext === '.webm')) {
             const parts = range.replace(/bytes=/, "").split("-");
             const partialstart = parts[0];
             const partialend = parts[1];
@@ -261,7 +263,8 @@ app.prepare().then(() => {
           } else {
             res.writeHead(200, {
               'Content-Length': stat.size,
-              'Content-Type': contentType
+              'Content-Type': contentType,
+              'Accept-Ranges': 'bytes'
             });
             fs.createReadStream(filePath).pipe(res);
           }
