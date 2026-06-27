@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import connectDB from '@/lib/connectDB';
 import Post from '@/models/Post';
+import Notification from '@/models/Notification';
 
-/**
- * POST /api/posts/[id]/like
- * إضافة أو إزالة إعجاب من المنشور
- */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -25,13 +22,35 @@ export async function POST(
   }
 
   const userId = session.user.id;
-  const hasLiked = post.likes.some((id: any) => id.toString() === userId);
+  const userName = session.user.name || 'مستخدم';
+  const hasLiked = post.likes.some((likerId: any) => likerId.toString() === userId);
 
   if (hasLiked) {
-    await Post.findByIdAndUpdate(id, { $pull: { likes: userId } });
+    // إزالة اللايك وتحديث العداد
+    await Post.findByIdAndUpdate(id, { 
+      $pull: { likes: userId },
+      $inc: { likesCount: -1 } 
+    });
     return NextResponse.json({ success: true, action: 'unliked' });
   } else {
-    await Post.findByIdAndUpdate(id, { $addToSet: { likes: userId } });
+    // إضافة اللايك وتحديث العداد
+    await Post.findByIdAndUpdate(id, { 
+      $addToSet: { likes: userId },
+      $inc: { likesCount: 1 } 
+    });
+
+    // إنشاء إشعار إذا لم يكن المستخدم يعجب بمنشوره الخاص
+    if (post.userId.toString() !== userId) {
+      await Notification.create({
+        userId: post.userId,
+        type: 'like',
+        senderId: userId,
+        senderName: userName,
+        postId: post._id,
+        text: `أعجب ${userName} بمساركتك`
+      });
+    }
+
     return NextResponse.json({ success: true, action: 'liked' });
   }
 }

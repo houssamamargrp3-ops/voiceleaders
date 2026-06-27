@@ -1,15 +1,42 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [notifOpen, setNotifOpen] = useState(false);
-  const { data: session } = useSession();
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { data: session, status } = useSession();
   const user = session?.user as any;
   const role = user?.role || 'trainee';
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetch('/api/notifications')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setNotifications(data.notifications || []);
+            setUnreadCount(data.unreadCount || 0);
+          }
+        })
+        .catch(console.error);
+    }
+  });
+
+  const handleNotifClick = async () => {
+    setNotifOpen(!notifOpen);
+    if (!notifOpen && unreadCount > 0) {
+      // Mark as read
+      setUnreadCount(0);
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      fetch('/api/notifications', { method: 'PUT' }).catch(console.error);
+    }
+  };
 
   return (
     <nav className="navbar" style={{ padding: '0 16px' }}>
@@ -48,10 +75,10 @@ export default function Navbar() {
       {/* Right side actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 'auto' }}>
 
-        {/* Notifications - hidden on mobile (accessible via profile tab) */}
+        {/* Notifications - Desktop Dropdown */}
         <div className="dropdown hidden-mobile" style={{ position: 'relative' }}>
           <button
-            onClick={() => setNotifOpen(!notifOpen)}
+            onClick={handleNotifClick}
             style={{
               width: 36, height: 36, borderRadius: 8,
               background: 'rgba(255,255,255,0.05)',
@@ -62,29 +89,44 @@ export default function Navbar() {
             }}
           >
             🔔
-            <span className="notif-dot"></span>
+            {unreadCount > 0 && <span className="notif-dot" style={{ position: 'absolute', top: 8, right: 8, width: 8, height: 8, background: '#ef4444', borderRadius: '50%' }}></span>}
           </button>
           {notifOpen && (
             <div className="dropdown-menu" style={{ width: 280 }}>
               <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#D4AF37' }}>الإشعارات</span>
               </div>
-              {[
-                { icon: '🏆', text: 'فاز أحمد بتحدي الأسبوع!', time: 'منذ 5 دقائق', unread: true },
-                { icon: '📚', text: 'درس جديد في دورة الخطابة', time: 'منذ ساعة', unread: true },
-                { icon: '❤️', text: 'سارة أعجبت بفيديوك', time: 'منذ 3 ساعات', unread: false },
-              ].map((n, i) => (
-                <div key={i} className={`notif-item ${n.unread ? 'unread' : ''}`}>
-                  <span style={{ fontSize: '1.2rem' }}>{n.icon}</span>
-                  <div>
-                    <div style={{ fontSize: '0.8rem', color: '#ddd' }}>{n.text}</div>
-                    <div style={{ fontSize: '0.7rem', color: '#666', marginTop: 2 }}>{n.time}</div>
-                  </div>
-                </div>
-              ))}
+              {notifications.length === 0 ? (
+                <div style={{ padding: '20px', textAlign: 'center', color: '#666', fontSize: '0.85rem' }}>لا توجد إشعارات</div>
+              ) : (
+                notifications.map((n, i) => {
+                  const icon = n.type === 'like' ? '❤️' : n.type === 'comment' ? '💬' : n.type === 'challenge_win' ? '🏆' : '🔔';
+                  return (
+                    <div key={i} className={`notif-item ${!n.isRead ? 'unread' : ''}`} style={{ padding: '12px 16px', display: 'flex', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.04)', background: !n.isRead ? 'rgba(212,175,55,0.05)' : 'transparent' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+                      <div>
+                        <div style={{ fontSize: '0.8rem', color: !n.isRead ? '#fff' : '#ddd' }}>{n.text}</div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           )}
         </div>
+
+        {/* Notifications - Mobile Link */}
+        <Link href="/notifications" className="show-mobile" style={{
+          width: 36, height: 36, borderRadius: 8,
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.07)',
+          color: '#888', fontSize: '1rem', textDecoration: 'none',
+          display: 'none', alignItems: 'center', justifyContent: 'center',
+          position: 'relative',
+        }}>
+          🔔
+          {unreadCount > 0 && <span className="notif-dot" style={{ position: 'absolute', top: 8, right: 8, width: 8, height: 8, background: '#ef4444', borderRadius: '50%' }}></span>}
+        </Link>
 
         {/* Upload Button - icon only on mobile */}
         {role !== 'trainer' && (
@@ -121,7 +163,7 @@ export default function Navbar() {
       <style>{`
         @media (max-width: 768px) {
           .hidden-mobile { display: none !important; }
-          .show-mobile { display: inline !important; }
+          .show-mobile { display: flex !important; }
           .navbar { height: 58px !important; }
         }
         @media (min-width: 769px) {

@@ -45,5 +45,18 @@ export async function POST(
     return NextResponse.json({ error: 'المنشور غير موجود' }, { status: 404 });
   }
 
+  // إنشاء إشعار
+  if (post.userId.toString() !== session.user.id) {
+    const Notification = (await import('@/models/Notification')).default;
+    await Notification.create({
+      userId: post.userId,
+      type: 'comment',
+      senderId: session.user.id,
+      senderName: session.user.name || 'مجهول',
+      postId: post._id,
+      text: `علّق ${session.user.name || 'مجهول'} على مشاركتك`
+    });
+  }
+
   return NextResponse.json({ success: true, comment: newComment });
 }
