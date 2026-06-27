@@ -35,6 +35,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       name: e.userId?.name || 'مستخدم مجهول',
       email: e.userId?.email || '',
       progress: e.progress,
+      completedLessons: e.completedLessons || [],
+      passedQuizzes: e.passedQuizzes || [],
       enrolledAt: e.enrolledAt,
     }));
 
