@@ -5,10 +5,7 @@ import Image from 'next/image';
 
 export default async function LandingPage() {
   const session = await auth();
-  
-  if (session) {
-    redirect('/feed');
-  }
+  const isLoggedIn = !!session;
 
   const features = [
     {
@@ -58,17 +55,25 @@ export default async function LandingPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Link href="/auth/login" style={{
-            padding: '8px 20px', borderRadius: 8,
-            border: '1px solid rgba(212,175,55,0.4)',
-            color: '#D4AF37', fontWeight: 600, fontSize: '0.85rem',
-            textDecoration: 'none', transition: 'all 0.2s',
-          }}>
-            تسجيل الدخول
-          </Link>
-          <Link href="/auth/register" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
-            انضم مجاناً
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/feed" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
+              دخول للمنصة 🚀
+            </Link>
+          ) : (
+            <>
+              <Link href="/auth/login" style={{
+                padding: '8px 20px', borderRadius: 8,
+                border: '1px solid rgba(212,175,55,0.4)',
+                color: '#D4AF37', fontWeight: 600, fontSize: '0.85rem',
+                textDecoration: 'none', transition: 'all 0.2s',
+              }}>
+                تسجيل الدخول
+              </Link>
+              <Link href="/auth/register" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
+                انضم مجاناً
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -115,9 +120,15 @@ export default async function LandingPage() {
           </p>
 
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 60 }}>
-            <Link href="/auth/register" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
-              🚀 ابدأ رحلتك مجاناً
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/feed" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
+                🚀 دخول للمنصة
+              </Link>
+            ) : (
+              <Link href="/auth/register" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
+                🚀 ابدأ رحلتك مجاناً
+              </Link>
+            )}
           </div>
 
           {/* Stats Row */}
