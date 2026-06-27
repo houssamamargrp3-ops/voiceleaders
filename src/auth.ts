@@ -97,5 +97,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 يوم
   },
 
+  trustHost: true,
+
   secret: process.env.AUTH_SECRET,
 });
