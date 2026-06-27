@@ -4,6 +4,8 @@ import connectDB from '@/lib/connectDB';
 import Video from '@/models/Video';
 import fs from 'fs/promises';
 import path from 'path';
+import User from '@/models/User';
+import Post from '@/models/Post';
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,10 +51,8 @@ export async function POST(req: NextRequest) {
       duration: '0:00',
     });
 
-    const User = (await import('@/models/User')).default;
     const userDoc = await User.findById(session.user.id).select('level avatar');
 
-    const Post = (await import('@/models/Post')).default;
     await Post.create({
       userId: session.user.id,
       userName: session.user.name || 'مستخدم',
@@ -62,15 +62,15 @@ export async function POST(req: NextRequest) {
       videoUrl,
       caption: description || '',
       tags: tags ? tags.split('،').map(t => t.trim()).filter(Boolean) : [],
-      type: challenge ? 'challenge_entry' : 'speech',
-      challengeId: challenge || null,
+      type: challenge && challenge !== 'null' ? 'challenge_entry' : 'speech',
+      challengeId: challenge && challenge !== 'null' ? challenge : null,
     });
 
     await User.findByIdAndUpdate(session.user.id, { $inc: { videosCount: 1 } });
 
     return NextResponse.json({ success: true, video });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Video upload error:', error);
-    return NextResponse.json({ error: 'فشل في رفع الفيديو' }, { status: 500 });
+    return NextResponse.json({ error: 'فشل في رفع الفيديو: ' + error.message }, { status: 500 });
   }
 }
