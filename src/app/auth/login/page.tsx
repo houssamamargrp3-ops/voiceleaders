@@ -25,11 +25,15 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        // إذا كان الخطأ مخصصاً من auth.ts (مثل خطأ توافق الصلاحية) سيأتي في result.error
-        // لكن أحياناً NextAuth يعيد "CredentialsSignin"، لذا نعالجه:
-        const errorMessage = result.error.includes('CredentialsSignin') 
-          ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' 
-          : result.error;
+        let errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+        if (
+          typeof result.error === 'string' &&
+          result.error !== 'undefined' &&
+          result.error !== 'CredentialsSignin' &&
+          !result.error.includes('CredentialsSignin')
+        ) {
+          errorMessage = result.error;
+        }
         setError(errorMessage);
         setLoading(false);
         return;
