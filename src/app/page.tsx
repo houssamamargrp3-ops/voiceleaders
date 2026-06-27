@@ -15,12 +15,19 @@ export default async function LandingPage() {
     redirect('/feed');
   }
 
-  // Fetch real stats from database
-  await connectDB();
-  const userCount = await User.countDocuments() || 0;
-  const challengeCount = await Challenge.countDocuments() || 0;
-  const courseCount = await Course.countDocuments() || 0;
-  const postCount = await Post.countDocuments() || 0;
+  // Fetch real stats from database safely
+  let userCount = 0, challengeCount = 0, courseCount = 0, postCount = 0;
+  try {
+    await connectDB();
+    [userCount, challengeCount, courseCount, postCount] = await Promise.all([
+      User.countDocuments(),
+      Challenge.countDocuments(),
+      Course.countDocuments(),
+      Post.countDocuments(),
+    ]);
+  } catch (e) {
+    console.error('Stats fetch error:', e);
+  }
 
   const features = [
     {
