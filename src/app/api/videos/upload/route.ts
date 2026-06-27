@@ -49,6 +49,25 @@ export async function POST(req: NextRequest) {
       duration: '0:00',
     });
 
+    const User = (await import('@/models/User')).default;
+    const userDoc = await User.findById(session.user.id).select('level avatar');
+
+    const Post = (await import('@/models/Post')).default;
+    await Post.create({
+      userId: session.user.id,
+      userName: session.user.name || 'مستخدم',
+      userAvatar: userDoc?.avatar || '',
+      userLevel: userDoc?.level || 'beginner',
+      title,
+      videoUrl,
+      caption: description || '',
+      tags: tags ? tags.split('،').map(t => t.trim()).filter(Boolean) : [],
+      type: challenge ? 'challenge_entry' : 'speech',
+      challengeId: challenge || null,
+    });
+
+    await User.findByIdAndUpdate(session.user.id, { $inc: { videosCount: 1 } });
+
     return NextResponse.json({ success: true, video });
   } catch (error) {
     console.error('Video upload error:', error);

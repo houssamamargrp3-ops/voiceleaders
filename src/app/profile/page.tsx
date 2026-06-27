@@ -166,9 +166,13 @@ export default async function ProfilePage() {
                   background: '#111', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, overflow: 'hidden'
                 }}>
                   <div style={{
-                    aspectRatio: '16/9', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    aspectRatio: '16/9', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
                   }}>
-                    🎬
+                    {video.url ? (
+                      <video src={video.url} controls style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                      <span style={{ fontSize: '2rem' }}>🎬</span>
+                    )}
                   </div>
                   <div style={{ padding: 16 }}>
                     <h3 style={{ fontSize: '0.95rem', color: '#fff', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.title}</h3>
