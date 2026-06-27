@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
     // Save the file
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const filename = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+    // Sanitize filename to prevent URI encoding issues with Arabic/special characters
+    const safeOriginalName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
+    const filename = `${Date.now()}-${safeOriginalName || 'video.mp4'}`;
     const filePath = path.join(uploadDir, filename);
     await fs.writeFile(filePath, buffer);
 

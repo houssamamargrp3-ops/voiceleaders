@@ -226,7 +226,7 @@ app.prepare().then(() => {
     // Serve dynamic uploaded files (Next.js standalone doesn't serve them natively)
     if (req.url && req.url.startsWith('/uploads/')) {
       try {
-        const urlPath = req.url.split('?')[0];
+        const urlPath = decodeURIComponent(req.url.split('?')[0]);
         // Prevent path traversal
         const safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, '');
         const filePath = path.join(process.cwd(), 'public', safePath);
