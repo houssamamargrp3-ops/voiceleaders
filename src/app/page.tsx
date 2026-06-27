@@ -70,7 +70,7 @@ export default async function LandingPage() {
                 تسجيل الدخول
               </Link>
               <Link href="/auth/register" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                انضم مجاناً
+                انضم إلينا
               </Link>
             </>
           )}
@@ -126,7 +126,7 @@ export default async function LandingPage() {
               </Link>
             ) : (
               <Link href="/auth/register" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
-                🚀 ابدأ رحلتك مجاناً
+                🚀 انضم إلينا
               </Link>
             )}
           </div>
