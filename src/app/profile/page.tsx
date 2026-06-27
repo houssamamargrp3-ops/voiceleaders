@@ -8,7 +8,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import LogoutButton from '@/components/auth/LogoutButton';
-
+import DeleteVideoButton from '@/components/profile/DeleteVideoButton';
 export default async function ProfilePage() {
   const session = await auth();
 
@@ -175,8 +175,11 @@ export default async function ProfilePage() {
                     )}
                   </div>
                   <div style={{ padding: 16 }}>
-                    <h3 style={{ fontSize: '0.95rem', color: '#fff', marginBottom: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.title}</h3>
-                    <div style={{ color: '#666', fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+                      <h3 style={{ fontSize: '0.95rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{video.title}</h3>
+                      <DeleteVideoButton videoId={video._id.toString()} />
+                    </div>
+                    <div style={{ color: '#666', fontSize: '0.75rem', display: 'flex', gap: 12 }}>
                       <span>👁️ {video.views}</span>
                       <span>❤️ {video.likes?.length || 0}</span>
                     </div>
