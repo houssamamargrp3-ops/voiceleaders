@@ -144,9 +144,8 @@ const PostSchema = new Schema<IPost>(
 // ─────────────────────────────────────────────
 //  Middleware: تحديث likesCount تلقائياً
 // ─────────────────────────────────────────────
-PostSchema.pre('save', function (next: any) {
-  this.likesCount = this.likes.length;
-  next();
+PostSchema.pre('save', function () {
+  this.likesCount = this.likes?.length || 0;
 });
 
 // ─────────────────────────────────────────────

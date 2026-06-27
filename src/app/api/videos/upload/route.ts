@@ -51,26 +51,32 @@ export async function POST(req: NextRequest) {
       duration: '0:00',
     });
 
-    const userDoc = await User.findById(session.user.id).select('level avatar');
+    let postError = null;
+    try {
+      const userDoc = await User.findById(session.user.id);
 
-    await Post.create({
-      userId: session.user.id,
-      userName: session.user.name || 'مستخدم',
-      userAvatar: userDoc?.avatar || '',
-      userLevel: userDoc?.level || 'beginner',
-      title,
-      videoUrl,
-      caption: description || '',
-      tags: tags ? tags.split('،').map((t: string) => t.trim()).filter((t: string) => !!t) : [],
-      type: challenge && challenge !== 'null' ? 'challenge_entry' : 'speech',
-      challengeId: challenge && challenge !== 'null' ? challenge : null,
-    });
+      await Post.create({
+        userId: session.user.id,
+        userName: session.user.name || 'مستخدم',
+        userAvatar: userDoc?.avatar || '',
+        userLevel: userDoc?.level || 'beginner',
+        title,
+        videoUrl,
+        caption: description || '',
+        tags: tags && typeof tags === 'string' ? tags.split('،').map((t: string) => t.trim()).filter((t: string) => !!t) : [],
+        type: challenge && challenge !== 'null' ? 'challenge_entry' : 'speech',
+        challengeId: challenge && challenge !== 'null' ? challenge : null,
+      });
 
-    await User.findByIdAndUpdate(session.user.id, { $inc: { videosCount: 1 } });
+      await User.findByIdAndUpdate(session.user.id, { $inc: { videosCount: 1 } });
+    } catch (err: any) {
+      console.error('Post creation error:', err);
+      postError = err.stack || err.message;
+    }
 
-    return NextResponse.json({ success: true, video });
+    return NextResponse.json({ success: true, video, warning: postError });
   } catch (error: any) {
     console.error('Video upload error:', error);
-    return NextResponse.json({ error: 'فشل في رفع الفيديو: ' + error.message }, { status: 500 });
+    return NextResponse.json({ error: 'فشل في رفع الفيديو: ' + (error.stack || error.message) }, { status: 500 });
   }
 }
