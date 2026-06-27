@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         challengeId: challenge && challenge !== 'null' ? challenge : null,
       });
 
-      await User.findByIdAndUpdate(session.user.id, { $inc: { videosCount: 1 } });
+      await User.findByIdAndUpdate(session.user.id, { $inc: { videosCount: 1, points: 10 } });
     } catch (err: any) {
       console.error('Post creation error:', err);
       postError = err.stack || err.message;

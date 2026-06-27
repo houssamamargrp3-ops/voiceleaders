@@ -65,6 +65,10 @@ export async function POST(
     enrollment.lastAccessedAt = new Date();
     await enrollment.save();
 
+    // Add points to the user for completing a lesson
+    const User = (await import('@/models/User')).default;
+    await User.findByIdAndUpdate(session.user.id, { $inc: { points: 5 } });
+
     return NextResponse.json({
       success: true,
       enrollment,

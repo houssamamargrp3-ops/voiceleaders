@@ -88,5 +88,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // زيادة عدد المشاركين في التحدي
   await Challenge.findByIdAndUpdate(id, { $inc: { participantsCount: 1 } });
 
+  // Add points to the user for participating in a challenge
+  const User = (await import('@/models/User')).default;
+  await User.findByIdAndUpdate(session.user.id, { $inc: { points: 15 } });
+
   return NextResponse.json({ success: true, submission }, { status: 201 });
 }

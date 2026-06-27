@@ -84,6 +84,10 @@ export async function POST(
           enrollment.passedQuizzes = enrollment.passedQuizzes || [];
           enrollment.passedQuizzes.push({ quizIndex, score: scorePercentage });
           await enrollment.save();
+          
+          // Add points to the user for passing a quiz for the first time
+          const User = (await import('@/models/User')).default;
+          await User.findByIdAndUpdate(session.user.id, { $inc: { points: 20 } });
         } else if (scorePercentage > existingPass.score) {
           existingPass.score = scorePercentage;
           await enrollment.save();
