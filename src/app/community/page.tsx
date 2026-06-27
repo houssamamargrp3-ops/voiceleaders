@@ -78,6 +78,22 @@ export default function CommunityPage() {
     }
   };
 
+  const handleDelete = async (postId: string) => {
+    if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو بشكل نهائي؟')) return;
+    try {
+      const res = await fetch(`/api/posts/${postId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setPosts(prev => prev.filter(p => p.id !== postId));
+      } else {
+        alert(data.error || 'حدث خطأ أثناء الحذف');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('فشل الاتصال بالخادم');
+    }
+  };
+
   return (
     <AppLayout>
       <div style={{ maxWidth: 600, margin: '0 auto', paddingBottom: 60 }}>
@@ -121,6 +137,15 @@ export default function CommunityPage() {
                     <span style={{ marginRight: 'auto', fontSize: '0.7rem', background: 'rgba(212,175,55,0.1)', color: '#D4AF37', padding: '4px 10px', borderRadius: 100 }}>
                       مشاركة في تحدي 🏆
                     </span>
+                  )}
+                  {post.userId === userId && (
+                    <button onClick={() => handleDelete(post.id)} style={{
+                      marginLeft: post.type !== 'challenge_entry' ? 'auto' : 0,
+                      background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#ef4444',
+                      cursor: 'pointer', fontSize: '0.8rem', padding: '6px 10px', borderRadius: 6, fontWeight: 600
+                    }}>
+                      🗑️ حذف
+                    </button>
                   )}
                 </div>
 
