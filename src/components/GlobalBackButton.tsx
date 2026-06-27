@@ -11,10 +11,11 @@ export default function GlobalBackButton() {
   return (
     <button
       onClick={() => router.back()}
+      className="global-back-btn"
       style={{
         position: 'fixed',
         bottom: '24px',
-        left: '24px', // left side since it's RTL
+        left: '24px',
         zIndex: 9999,
         background: '#D4AF37',
         color: '#000',
@@ -34,7 +35,7 @@ export default function GlobalBackButton() {
       onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
       title="عودة للخلف"
     >
-      <span style={{ transform: 'rotate(180deg)' }}>➜</span>
+      <span style={{ transform: 'rotate(180deg)', display: 'block' }}>➜</span>
     </button>
   );
 }

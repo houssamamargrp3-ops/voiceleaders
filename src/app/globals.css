@@ -340,7 +340,7 @@ body {
   .sidebar { display: none; }
 }
 
-/* ===== MOBILE TAB BAR ===== */
+/* ===== MOBILE TAB BAR - WORLD CLASS ===== */
 .mobile-tabbar {
   display: none;
   position: fixed;
@@ -350,32 +350,532 @@ body {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid rgba(212, 175, 55, 0.15);
-  padding: 6px 0 env(safe-area-inset-bottom, 6px);
-  height: 64px;
+  /* Safe area for iPhone notch/home indicator */
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+  padding-top: 6px;
+  height: calc(60px + max(env(safe-area-inset-bottom), 0px));
 }
 @media (max-width: 768px) { .mobile-tabbar { display: flex; } }
+
 .tab-item {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   color: var(--gray-3);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.2s ease;
   padding: 4px 0;
+  /* Minimum touch target 44x44 per Apple HIG */
+  min-height: 44px;
+  position: relative;
 }
-.tab-item:hover, .tab-item.active {
+.tab-item:active { transform: scale(0.92); }
+.tab-item.active { color: var(--gold); }
+
+.tab-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 0 0 4px 4px;
+}
+
+/* ===== TOOLTIP ===== */
+.tooltip-wrap { position: relative; }
+.tooltip-wrap .tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--black-5);
+  color: var(--white);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+.tooltip-wrap:hover .tooltip { opacity: 1; }
+
+/* ===== NOTIFICATION DOT ===== */
+.notif-dot {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  position: absolute;
+  top: -1px; right: -1px;
+  animation: pulse-gold 2s ease infinite;
+}
+
+/* ===== TAG ===== */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--black-5);
+  color: var(--gray-4);
+  font-size: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ===== STAR RATING ===== */
+.stars { color: var(--gold); letter-spacing: 2px; }
+
+/* ===== LOADING SKELETON ===== */
+.skeleton {
+  background: linear-gradient(90deg, var(--black-3) 25%, var(--black-4) 50%, var(--black-3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--black-2);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  animation: fadeInUp 0.3s ease;
+}
+
+/* ===== TABS ===== */
+.tabs { display: flex; gap: 4px; background: var(--black-3); padding: 4px; border-radius: 10px; }
+.tab-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--gray-3);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+.tab-btn.active {
+  background: rgba(212,175,55,0.15);
   color: var(--gold);
 }
-.tab-item.active .tab-icon-wrap {
-  background: rgba(212, 175, 55, 0.12);
-  border-radius: 8px;
-  padding: 4px 12px;
+.tab-btn:hover:not(.active) { color: var(--white); }
+
+/* ===== DROPDOWN ===== */
+.dropdown { position: relative; }
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: var(--black-3);
+  border: 1px solid rgba(212,175,55,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 500;
+  animation: fadeInUp 0.15s ease;
 }
+.dropdown-item {
+  padding: 11px 16px;
+  color: var(--gray-4);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.dropdown-item:hover { background: rgba(212,175,55,0.08); color: var(--gold); }
+
+/* ===== ADMIN STATS ===== */
+.admin-stat {
+  background: var(--black-3);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 22px;
+  transition: all 0.3s ease;
+}
+.admin-stat:hover { border-color: rgba(212,175,55,0.2); }
+
+/* ===== EVENT CARD ===== */
+.event-card {
+  background: var(--black-3);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.event-card:hover {
+  border-color: rgba(212,175,55,0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+}
+.event-date-badge {
+  background: rgba(212,175,55,0.15);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: center;
+  min-width: 56px;
+}
+
+/* ===== CHALLENGE CARD ===== */
+.challenge-card {
+  background: var(--black-3);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.challenge-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at center, rgba(212,175,55,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.challenge-card:hover {
+  border-color: rgba(212,175,55,0.3);
+  transform: translateY(-3px);
+}
+
+/* ===== PROFILE PAGE ===== */
+.profile-cover {
+  height: 220px;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  position: relative;
+  overflow: hidden;
+}
+.profile-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.8));
+}
+.profile-avatar-wrap {
+  position: relative;
+  width: 100px; height: 100px;
+  margin-top: -50px;
+  margin-left: 32px;
+}
+.profile-avatar-wrap img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  object-fit: cover;
+}
+.profile-avatar-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(var(--gold), var(--gold-light), var(--gold));
+  z-index: -1;
+  animation: spin-slow 4s linear infinite;
+}
+
+/* ===== FEED ===== */
+.feed-video {
+  background: var(--black-2);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.04);
+  margin-bottom: 24px;
+}
+.feed-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+}
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--gray-3);
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  /* Minimum touch target */
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
+.action-btn:hover { color: var(--gold); transform: scale(1.1); }
+.action-btn.liked { color: #f87171; }
+.action-btn span { font-size: 0.7rem; font-weight: 500; }
+
+/* ===== FILTERS ===== */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.filter-chip {
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--black-4);
+  color: var(--gray-3);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* Touch friendly */
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+.filter-chip:hover, .filter-chip.active {
+  background: rgba(212,175,55,0.12);
+  border-color: rgba(212,175,55,0.3);
+  color: var(--gold);
+}
+
+/* ===== SCROLLABLE ROW ===== */
+.scroll-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+  /* Smooth scroll on mobile */
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+.scroll-row::-webkit-scrollbar { display: none; }
+
+/* ===== NOTIFICATION PANEL ===== */
+.notif-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: background 0.2s;
+}
+.notif-item:hover { background: rgba(255,255,255,0.02); }
+.notif-item.unread { background: rgba(212,175,55,0.04); }
+
+/* ===== SEARCH BAR ===== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--black-4);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 10px 16px;
+  transition: all 0.3s ease;
+}
+.search-bar:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+}
+.search-bar input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--white);
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  flex: 1;
+}
+.search-bar input::placeholder { color: var(--gray-3); }
+
+/* ===== QUIZ ===== */
+.quiz-option {
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--black-4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+.quiz-option:hover { border-color: rgba(212,175,55,0.3); background: rgba(212,175,55,0.05); }
+.quiz-option.correct { border-color: #4ade80; background: rgba(34,197,94,0.1); color: #4ade80; }
+.quiz-option.wrong { border-color: #f87171; background: rgba(239,68,68,0.1); color: #f87171; }
+.quiz-option.selected { border-color: var(--gold); background: rgba(212,175,55,0.1); }
+
+/* ===== AI ANALYSIS ===== */
+.ai-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+.ai-wave-bar {
+  width: 4px;
+  background: var(--gold);
+  border-radius: 2px;
+  animation: wave 1.2s ease-in-out infinite;
+}
+@keyframes wave {
+  0%, 100% { height: 8px; }
+  50% { height: 32px; }
+}
+.ai-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.ai-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.ai-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.ai-wave-bar:nth-child(5) { animation-delay: 0.2s; }
+.ai-wave-bar:nth-child(6) { animation-delay: 0.1s; }
+
+/* ================================================
+   📱 MOBILE RESPONSIVE — WORLD CLASS STANDARDS
+   Based on: Apple HIG + Material Design 3
+   Min touch target: 44×44px (Apple) / 48×48dp (Google)
+   ================================================ */
+
+/* Prevent double-tap zoom on buttons */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Better tap highlight */
+* {
+  -webkit-tap-highlight-color: rgba(212, 175, 55, 0.1);
+}
+
+@media (max-width: 768px) {
+  /* ── Typography ── */
+  .section-title { font-size: 1.4rem; }
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.2rem !important; }
+  h3 { font-size: 1.05rem !important; }
+  p  { font-size: 0.9rem !important; line-height: 1.7 !important; }
+
+  /* ── Main Layout ── */
+  .main-content {
+    margin-right: 0;
+    padding: 76px 16px calc(72px + max(env(safe-area-inset-bottom), 0px)) 16px;
+  }
+  .sidebar { display: none; }
+
+  /* ── Cards ── */
+  .card { border-radius: 12px; }
+  .stat-card { padding: 14px; }
+  .challenge-card { padding: 16px; }
+  .admin-stat { padding: 14px; }
+
+  /* ── Buttons — minimum 44px height ── */
+  .btn-gold  { padding: 12px 20px; font-size: 0.9rem; min-height: 44px; }
+  .btn-outline { padding: 11px 20px; font-size: 0.9rem; min-height: 44px; }
+  .btn-ghost { min-height: 44px; }
+
+  /* ── Inputs — minimum 44px height ── */
+  .input { min-height: 44px; font-size: 16px !important; /* prevent iOS zoom */ }
+
+  /* ── Navbar ── */
+  .navbar-title-sub { display: none; }
+  .navbar { padding: 0 16px; }
+
+  /* ── Modal — slide from bottom on mobile ── */
+  .modal {
+    border-radius: 24px 24px 0 0;
+    max-height: 90vh;
+    padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+    margin: 0;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  /* ── Tables — horizontal scroll ── */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Filters — horizontal scroll ── */
+  .filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  /* ── Tabs — horizontal scroll ── */
+  .tabs { overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { white-space: nowrap; min-height: 40px; }
+
+  /* ── Profile ── */
+  .profile-cover { height: 160px; }
+  .profile-avatar-wrap { margin-left: 16px; }
+
+  /* ── Grid — single column on small screens ── */
+  .grid-2 { grid-template-columns: 1fr; gap: 12px; }
+
+  /* ── Challenge card ── */
+  .challenge-card { padding: 16px; }
+
+  /* ── Feed videos ── */
+  .feed-video { border-radius: 12px; margin-bottom: 16px; }
+
+  /* ── Dropdown — full width on mobile ── */
+  .dropdown-menu { left: 0; right: 0; min-width: unset; }
+
+  /* ── Search bar ── */
+  .search-bar { padding: 8px 14px; }
+  .search-bar input { font-size: 16px !important; /* prevent iOS zoom */ }
+
+  /* ── Back button position on mobile ── */
+  .global-back-btn {
+    bottom: calc(72px + max(env(safe-area-inset-bottom), 8px)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* ── Extra small screens (iPhone SE etc.) ── */
+  h1 { font-size: 1.3rem !important; }
+  .btn-gold, .btn-outline { width: 100%; text-align: center; }
+  .modal { padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); }
+}
+
+/* ── Landscape mobile ── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .mobile-tabbar { display: none; }
+  .main-content { padding-bottom: 16px; }
+}
+
 
 /* ===== HERO SECTION ===== */
 .hero-bg {
