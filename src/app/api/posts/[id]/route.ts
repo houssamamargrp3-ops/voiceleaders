@@ -9,9 +9,10 @@ import fs from 'fs/promises';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
@@ -20,7 +21,7 @@ export async function DELETE(
     await connectDB();
     
     // Find post first
-    const post = await Post.findById(params.id);
+    const post = await Post.findById(id);
     if (!post) {
       return NextResponse.json({ error: 'المنشور غير موجود' }, { status: 404 });
     }
@@ -34,7 +35,7 @@ export async function DELETE(
     const videoUrl = post.videoUrl;
 
     // Delete Post from DB
-    await Post.findByIdAndDelete(params.id);
+    await Post.findByIdAndDelete(id);
 
     // Find and delete the associated Video if exists
     if (videoUrl) {
