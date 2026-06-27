@@ -26,18 +26,14 @@ export async function POST(
   const hasLiked = post.likes.some((likerId: any) => likerId.toString() === userId);
 
   if (hasLiked) {
-    // إزالة اللايك وتحديث العداد
-    await Post.findByIdAndUpdate(id, { 
-      $pull: { likes: userId },
-      $inc: { likesCount: -1 } 
-    });
+    // إزالة اللايك
+    post.likes = post.likes.filter((likerId: any) => likerId.toString() !== userId);
+    await post.save();
     return NextResponse.json({ success: true, action: 'unliked' });
   } else {
-    // إضافة اللايك وتحديث العداد
-    await Post.findByIdAndUpdate(id, { 
-      $addToSet: { likes: userId },
-      $inc: { likesCount: 1 } 
-    });
+    // إضافة اللايك
+    post.likes.push(userId);
+    await post.save();
 
     // إنشاء إشعار إذا لم يكن المستخدم يعجب بمنشوره الخاص
     if (post.userId.toString() !== userId) {

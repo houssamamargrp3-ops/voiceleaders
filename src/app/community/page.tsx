@@ -37,7 +37,7 @@ export default function CommunityPage() {
         return {
           ...p,
           hasLiked: !p.hasLiked,
-          likesCount: p.hasLiked ? p.likesCount - 1 : p.likesCount + 1
+          likesCount: Math.max(0, p.hasLiked ? (p.likesCount || 0) - 1 : (p.likesCount || 0) + 1)
         };
       }
       return p;
