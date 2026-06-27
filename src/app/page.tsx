@@ -2,10 +2,25 @@ import Link from 'next/link';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
+import connectDB from '@/lib/connectDB';
+import User from '@/models/User';
+import Challenge from '@/models/Challenge';
+import Course from '@/models/Course';
+import Post from '@/models/Post';
 
 export default async function LandingPage() {
   const session = await auth();
-  const isLoggedIn = !!session;
+  
+  if (session) {
+    redirect('/feed');
+  }
+
+  // Fetch real stats from database
+  await connectDB();
+  const userCount = await User.countDocuments() || 0;
+  const challengeCount = await Challenge.countDocuments() || 0;
+  const courseCount = await Course.countDocuments() || 0;
+  const postCount = await Post.countDocuments() || 0;
 
   const features = [
     {
@@ -26,9 +41,9 @@ export default async function LandingPage() {
   ];
 
   const stats = [
-    { value: '+5,000', label: 'خطيب متدرب' },
-    { value: '+120', label: 'دورة وتحدي' },
-    { value: '+15', label: 'دولة عربية' },
+    { value: userCount.toString(), label: 'خطيب متدرب' },
+    { value: (challengeCount + courseCount).toString(), label: 'دورة وتحدي' },
+    { value: postCount.toString(), label: 'مشاركة وخطاب' },
   ];
 
   return (
@@ -55,25 +70,17 @@ export default async function LandingPage() {
         </div>
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {isLoggedIn ? (
-            <Link href="/feed" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
-              دخول للمنصة 🚀
-            </Link>
-          ) : (
-            <>
-              <Link href="/auth/login" style={{
-                padding: '8px 20px', borderRadius: 8,
-                border: '1px solid rgba(212,175,55,0.4)',
-                color: '#D4AF37', fontWeight: 600, fontSize: '0.85rem',
-                textDecoration: 'none', transition: 'all 0.2s',
-              }}>
-                تسجيل الدخول
-              </Link>
-              <Link href="/auth/register" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
-                انضم إلينا
-              </Link>
-            </>
-          )}
+          <Link href="/auth/login" style={{
+            padding: '8px 20px', borderRadius: 8,
+            border: '1px solid rgba(212,175,55,0.4)',
+            color: '#D4AF37', fontWeight: 600, fontSize: '0.85rem',
+            textDecoration: 'none', transition: 'all 0.2s',
+          }}>
+            تسجيل الدخول
+          </Link>
+          <Link href="/auth/register" className="btn-gold" style={{ padding: '8px 20px', fontSize: '0.85rem', textDecoration: 'none' }}>
+            انضم إلينا
+          </Link>
         </div>
       </nav>
 
@@ -120,15 +127,9 @@ export default async function LandingPage() {
           </p>
 
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 60 }}>
-            {isLoggedIn ? (
-              <Link href="/feed" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
-                🚀 دخول للمنصة
-              </Link>
-            ) : (
-              <Link href="/auth/register" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
-                🚀 انضم إلينا
-              </Link>
-            )}
+            <Link href="/auth/register" className="btn-gold" style={{ fontSize: '1rem', padding: '14px 36px', textDecoration: 'none' }}>
+              🚀 انضم إلينا
+            </Link>
           </div>
 
           {/* Stats Row */}
