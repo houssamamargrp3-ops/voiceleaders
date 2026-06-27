@@ -9,10 +9,13 @@ import Course from '@/models/Course';
 import Post from '@/models/Post';
 
 export default async function LandingPage() {
-  const session = await auth();
-  
-  if (session) {
-    redirect('/feed');
+  try {
+    const session = await auth();
+    if (session) {
+      redirect('/feed');
+    }
+  } catch {
+    // auth() failed (e.g. misconfigured AUTH_URL) — show landing page
   }
 
   // Fetch real stats from database safely
