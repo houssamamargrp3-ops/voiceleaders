@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       url: videoUrl,
       user: session.user.id,
       userName: session.user.name || 'مستخدم',
-      tags: tags ? tags.split('،').map(t => t.trim()).filter(Boolean) : [],
+      tags: tags ? tags.split('،').map((t: string) => t.trim()).filter((t: string) => !!t) : [],
       challenge: challenge || '',
       duration: '0:00',
     });
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       title,
       videoUrl,
       caption: description || '',
-      tags: tags ? tags.split('،').map(t => t.trim()).filter(Boolean) : [],
+      tags: tags ? tags.split('،').map((t: string) => t.trim()).filter((t: string) => !!t) : [],
       type: challenge && challenge !== 'null' ? 'challenge_entry' : 'speech',
       challengeId: challenge && challenge !== 'null' ? challenge : null,
     });
