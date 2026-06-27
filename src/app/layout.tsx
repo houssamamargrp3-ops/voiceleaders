@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
+import GlobalBackButton from "@/components/GlobalBackButton";
 
 export const metadata: Metadata = {
   title: "المنيعة لقادة الإلقاء | DZ Young Leaders",
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           {children}
+          <GlobalBackButton />
         </AuthProvider>
       </body>
     </html>
