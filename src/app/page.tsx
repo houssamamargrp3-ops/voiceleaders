@@ -178,14 +178,13 @@ export default async function LandingPage() {
             <div style={{ 
               width: 200, height: 200, borderRadius: '50%', overflow: 'hidden',
               border: '4px solid #D4AF37', flexShrink: 0, margin: '0 auto',
-              background: '#222'
+              background: '#222', position: 'relative'
             }}>
-              {/* Replace src with the real image path later */}
               <Image 
-                src="/default-avatar.png" 
-                alt="قائد المشروع" 
-                width={200} height={200}
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                src="/images/leader.jpg" 
+                alt="القائد مبروكي زكرياء" 
+                fill
+                style={{ objectFit: 'cover' }}
               />
             </div>
 
@@ -195,17 +194,17 @@ export default async function LandingPage() {
                 قائد ومؤسس المشروع
               </div>
               <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, color: '#fff' }}>
-                [اسم قائد المشروع]
+                الشاب مبروكي زكرياء
               </h2>
               <p style={{ color: '#aaa', fontSize: '1.1rem', lineHeight: 1.8, marginBottom: 20 }}>
-                "هذا النص مخصص لنبذة عن قائد المشروع، يمكنك كتابة إنجازاته ورؤيته للمستقبل وكيف أسس هذه المنصة لدعم الخطباء والقادة الشباب."
+                متكون في المعهد العالي لتكوين إطارات الشباب في ورقلة. قائد نادي رواد الإلقاء والخطابة بالمنيعة، فائز في عدة مسابقات في الميكروفون الذهبي والتنشيط.
               </p>
               <div style={{ display: 'flex', gap: 12 }}>
-                <span style={{ background: '#111', padding: '6px 12px', borderRadius: 8, fontSize: '0.8rem', border: '1px solid #333' }}>
-                  🏅 مدرب دولي
+                <span style={{ background: '#111', padding: '6px 12px', borderRadius: 8, fontSize: '0.8rem', border: '1px solid #333', color: '#ccc' }}>
+                  🏅 الميكروفون الذهبي
                 </span>
-                <span style={{ background: '#111', padding: '6px 12px', borderRadius: 8, fontSize: '0.8rem', border: '1px solid #333' }}>
-                  🎤 متحدث تحفيزي
+                <span style={{ background: '#111', padding: '6px 12px', borderRadius: 8, fontSize: '0.8rem', border: '1px solid #333', color: '#ccc' }}>
+                  🎤 نادي رواد الإلقاء والخطابة
                 </span>
               </div>
             </div>
