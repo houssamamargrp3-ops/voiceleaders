@@ -25,11 +25,7 @@ export default async function LandingPage() {
     },
   ];
 
-  const stats = [
-    { value: '+5,000', label: 'خطيب متدرب' },
-    { value: '+120', label: 'دورة وتحدي' },
-    { value: '+15', label: 'دولة عربية' },
-  ];
+
 
   return (
     <div style={{ background: '#0A0A0A', minHeight: '100vh', overflowX: 'hidden', color: '#fff' }}>
@@ -131,21 +127,7 @@ export default async function LandingPage() {
             )}
           </div>
 
-          {/* Stats Row */}
-          <div style={{
-            display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center',
-            padding: '24px 40px',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(212,175,55,0.12)',
-            borderRadius: 20, backdropFilter: 'blur(10px)',
-          }}>
-            {stats.map((s, i) => (
-              <div key={i} style={{ textAlign: 'center', padding: '0 20px' }}>
-                <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#D4AF37' }}>{s.value}</div>
-                <div style={{ fontSize: '0.8rem', color: '#666', marginTop: 2 }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
+
         </div>
       </section>
 
