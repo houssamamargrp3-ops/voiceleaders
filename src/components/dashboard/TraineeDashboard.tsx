@@ -161,12 +161,12 @@ export default function TraineeDashboard({ user }: { user: any }) {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h2 className="section-title" style={{ fontSize: '1.2rem', marginBottom: 0 }}>🎥 من المجتمع</h2>
-              <Link href="/feed" style={{ color: '#D4AF37', fontSize: '0.8rem', textDecoration: 'none' }}>عرض الكل</Link>
+              <Link href="/community" style={{ color: '#D4AF37', fontSize: '0.8rem', textDecoration: 'none' }}>عرض الكل</Link>
             </div>
             {recentVideos.length > 0 ? (
               <div className="grid-3">
                 {recentVideos.map((video: any) => (
-                  <Link key={video.id} href="/feed" style={{ textDecoration: 'none' }}>
+                  <Link key={video.id} href="/community" style={{ textDecoration: 'none' }}>
                     <div className="video-card">
                       <div className="video-thumbnail" style={{ height: 120 }}>
                         <div style={{
